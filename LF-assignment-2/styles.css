@@ -94,7 +94,9 @@ body.light-mode{
   background: var(--primary-card-background-color);
   background-color: #282828;
 }
-
+.light-mode .circular_image>img{
+  filter: brightness(0%);
+}
 #darkmode-toggle{
   z-index: 2;
 }
