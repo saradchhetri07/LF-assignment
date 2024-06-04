@@ -15,6 +15,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
 </head>
 
 <body>
@@ -26,6 +27,27 @@
                 <img src="assets/container1/musify.svg" alt="">
             </div>
 
+            <div class="header__mobile
+            header__padding-top
+            ">
+                <div class="header__mobile-icon">
+                    <i class="fa-solid fa-bars white-icon"></i>
+                </div>
+                <div class="header__mobile-image">
+                    <img src="assets/container1/musify.svg" alt="musify logo">
+                </div>
+
+                <div class="header__mobile-switch">
+                    <div class="header__mobile-toggle">
+                    </div>
+                    <div class="header__mobile-shopping-cart
+                    
+                    ">
+                        <i class="fas fa-shopping-cart white-icon"></i>
+                    </div>
+
+                </div>
+            </div>
             <div class="header__nav">
                 <div class="header__nav-link" id="Home">Home</div>
                 <div class="header__nav-link">Explore</div>
@@ -34,9 +56,21 @@
 
 
             <!-- * header toogle to toggle background color -->
-            <div class="header__toggle">
+            <div class="header_toggle">
+                <!-- <input type="checkbox" class="checkbox" id="checkbox">
+                <label for="checkbox" class="checkbox-label">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                    <span class="ball"></span>
+                </label> -->
+
+                <input type="checkbox" id="darkmode-toggle" />
+
+                <label for="darkmode-toggle"> khbhb</label>
 
             </div>
+
+
 
             <!-- * icons include search and cart -->
             <div class="header__icons">
@@ -63,6 +97,15 @@
             </div>
         </header>
 
+
+        <div id="header__mobile-search-box">
+            <div class="header__mobile-search-icon">
+                <i class="fas fa-search search-white-icon"></i>
+            </div>
+            <div class="header__mobile-search-text">
+                <span>Search</span>
+            </div>
+        </div>
         <!-- for gradient background -->
 
 
@@ -110,6 +153,19 @@
         </div>
 
         <div class="container-1__left-ellipse-2">
+        </div>
+
+        <div id="mobile_btn">
+            <div id="mobile_btn-shop">
+                <span>
+                    Shop now
+                </span>
+            </div>
+            <div id="mobile_btn-cart">
+
+                <i class="fa-solid fa-cart-shopping  shoping-cart-btn"></i>
+                <span class="shoping-cart-btn">Add to cart</span>
+            </div>
         </div>
 
         <div class="container-1__bottom">
@@ -171,6 +227,9 @@
             <img src="assets/container1/hero_model.png" alt="">
         </div>
 
+        <div class="circular_image">
+            <img src="assets/container1/arrow-down.svg" alt="">
+        </div>
         </div>
 
 
@@ -497,30 +556,17 @@
 
         <!-- * another section for designing cicular rounded headsets -->
         <div class="container2__offer">
+
+            <div class="mobile_exclusive__offer">
+                <span>
+                    Exclusive offer
+                </span>
+            </div>
+
             <div class="container2__offer--headset">
-                <!-- <div class="headset__bigger--circle">
-                    <div class="headset__smaller--circle">
-
-                        <div class="smaller__circle--design">
-                            <div class="design__percent">
-                                20% <br>
-                                off
-                            </div>
-
-
-                        </div>
-
-                        <div class="headset__bigger--circle--image">
-
-                        </div>
-                    </div>
-
-                    <div class="headset__bigger--circle--image">
-                        <img src="assets/container2/headphone2.svg" alt="">
-                    </div>
-                </div> -->
                 <div class="headset__bigger--circle">
                     <img src="assets/container2/headphone2.svg" alt="">
+
 
 
                     <!-- TODO -->
@@ -609,6 +655,21 @@
 
             </div>
 
+            <div class="headset__smaller--circle">
+
+                <div class="smaller__circle--design">
+                    <div class="design__percent">
+                        20% <br>
+                        off
+                    </div>
+
+
+                </div>
+
+                <div class="headset__bigger--circle--image">
+
+                </div>
+            </div>
 
         </div>
 
@@ -659,8 +720,9 @@
                         <img src="assets/container2/arrivals-1.svg" alt="">
                     </div>
 
-                    <div class="headphone__info
+                    <div class="
                     headphone__info--arival-border
+                    arrivals1__card--color
                     ">
                         <div class="headphone__info--about
                         headphone__info--about--padding-left
@@ -728,12 +790,14 @@
                         <img src="assets/container2/arrivals-2.svg" alt="">
                     </div>
 
-                    <div class="headphone__info
+                    <div class="
                     headphone__info--arival-border
+                    arrivals1__card--color
                     ">
                         <div class="headphone__info--about
                         headphone__info--about--padding-left
                         headphone__info--about--padding-right
+                        
                         ">
                             <h1 class="headphone__info--about--h1">
                                 Wireless Headphones
@@ -798,8 +862,9 @@
                         <img src="assets/container2/arrivals-3.svg" alt="">
                     </div>
 
-                    <div class="headphone__info
+                    <div class="
                     headphone__info--arival-border
+                    arrivals1__card--color
                     ">
                         <div class="headphone__info--about
                         headphone__info--about--padding-left
@@ -971,10 +1036,176 @@
 
                 </div>
 
-            </div>
+                <div class="container-3__rightmost-div">
+                    <!-- * for about us -->
+                    <div class="container-3__shop">
+                        <div class="container-3__shop--heading">
+                            <span>
+                                About us
+                            </span>
+                        </div>
+                        <div class="container-3__shop-list">
+                            <ul>
+                                <li>Human Corporate</li>
+                                <li>Privacy Policy</li>
+                                <li>Terms of Use</li>
+                                <li>Product Support</li>
+                                <li>Why direct buy</li>
+                                <li>JBL Sound Partners</li>
+                            </ul>
+                        </div>
 
-            <!-- for About us section -->
-            <!-- <div class="container-3__about-us">
+                    </div>
+
+                    <!-- * contact us -->
+                    <div class="container-3__shop">
+                        <div class="container-3__shop--heading">
+                            <span>
+                                Contact Us by:
+                            </span>
+                        </div>
+                        <div class="container-3__shop-list">
+                            <ul>
+                                <li>1800-102-0525</li>
+                                <li>Mon-Sun- 10AM-7PM
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- * manufactured-by section -->
+                    <div class="container-3__shop">
+                        <div class="container-3__shop--heading">
+                            <span>
+                                Manufactured by:
+                            </span>
+                        </div>
+                        <div class="container-3__shop-list">
+                            <ul>
+                                <li>Harmal International</li>
+                                <li>Industries,Inc</li>
+                                <li>8500,Balboa Blvd</li>
+                                <li>Northridge, CA 91329,USA</li>
+                                <li>Why direct buy</li>
+                                <li>JBL Sound Partners</li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <!--* share on social media -->
+                    <div class="container-3__contact">
+                        <div class="container-3__shop--heading">
+                            <span>
+                                Share on Social Media
+                            </span>
+                        </div>
+
+                        <div class="container-3__social-icons">
+                            <div class="container-3__icon">
+                                <img src="assets/container3/google.svg" alt="">
+                            </div>
+                            <div class="container-3__icon">
+                                <img src="assets/container3/instagram.svg" alt="">
+                            </div>
+                            <div class="container-3__icon">
+                                <img src="assets/container3/twitter.svg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- * footer only for mobile -->
+                <div class="container-3__mobile-footer-element">
+                    <!-- * newsletter -->
+                    <div class="container-3__contact">
+                        <div class="container-3__shop--heading">
+                            <span>
+                                Subscribe to our Newsletter
+                            </span>
+                        </div>
+
+                        <!-- * container-3 search filed -->
+                        <div class="header__mobile-search-box--footer
+                        header__mobile-search-box
+                        header__mobile-search-box--border
+                        ">
+                            <div class="header__mobile-search-text">
+                                <span>Enter your main id</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="
+                        headphone__buy--btn
+                        headphone__btn
+                        headphone__info--about--padding-left
+                        headphone__btn--width
+                        container-3__footer-subsribe
+                        ">
+                        <span>Subscribe</span>
+                    </div>
+
+                    <div class="shop--support__image--end">
+                        <img src="assets/container1/musify.svg" alt="">
+                    </div>
+
+                    <div class="copyright">
+
+                        <i class="fa-solid fa-copyright"></i>
+                        <span>
+                            2022..Mustify.All.Rights.Reserved
+                        </span>
+                    </div>
+                </div>
+
+                <div class="container-3__web-footer-element">
+                    <div class="container-3__shop--heading">
+                        <span>
+                            Subscribe to our Newsletter
+                        </span>
+                    </div>
+
+                    <div class="mail__subscribe
+
+                    ">
+                        <div class="
+                    header__mobile-search-box--footer
+                    header__mobile-search-box
+                    header__mobile-search-box--border
+                    footer__web-mail-subscribe
+                    ">
+                            <div class="header__mobile-search-text">
+                                <span>Enter your main id</span>
+                            </div>
+
+
+                        </div>
+
+                        <div class="
+                        headphone__buy--btn
+                        headphone__btn
+                        headphone__info--about--padding-left
+                        headphone__btn--width
+                        container-3__footer-subsribe">
+                            <span>Subscribe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="copyright-web">
+
+                    <i class="fa-solid fa-copyright"></i>
+                    <span>
+                        2022..Mustify.All.Rights.Reserved
+                    </span>
+                </div>
+
+                <!-- for About us section -->
+                <!-- <div class="container-3__about-us">
                 <div class="container-3__shop--heading">
                     <span>
                         About Us
@@ -1076,7 +1307,7 @@
 
 
             </div> -->
-        </div>
+            </div>
 
         </div>
 
