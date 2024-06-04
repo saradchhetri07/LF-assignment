@@ -759,6 +759,7 @@ font-weight: 700;
   height: 100%;
 }
 .headset__smaller--circle{
+
   left:100px;
   position: absolute;
   height: 20vh;
@@ -1053,7 +1054,7 @@ letter-spacing: 1.05px;
     margin-top: 30px;
     height: 90px;
     width: 90px;
-    transform: translate(15px, -340px);
+    transform: translate(-99px, 17px);
   }
   .design__percent{
     text-align: center;
@@ -1250,6 +1251,7 @@ letter-spacing: 0.64px;
   width: 100px;
   fill: #370665;
   filter: drop-shadow(8px 10px 17px rgba(0, 0, 0, 0.25));
+  transform: translate(0px, -1px);
 }
 .header__mobile-icon>i{
     font-size: 21px;
