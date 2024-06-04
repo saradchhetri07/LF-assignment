@@ -1183,7 +1183,9 @@ letter-spacing: 0.64px;
   display: flex;
   justify-content: center;
 }
-
+.header_toggle{
+  transform: translateX(-150px);
+}
 .container-1__left-ellipse-1{
     display: flex
 }
