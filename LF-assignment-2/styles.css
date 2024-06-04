@@ -87,15 +87,20 @@ body.light-mode{
 .light-mode .container-1__left-ellipse-1{
   background: none;
 }
+
 .light-mode .container-1__left-ellipse-2{
   background: none;
 }
+
 .light-mode .headphone__info{
   background: var(--primary-card-background-color);
   background-color: #282828;
 }
 .light-mode .circular_image>img{
   filter: brightness(0%);
+}
+.light-mode .container-1__bottom-sub-price>span:nth-child(2n){
+  color: black;
 }
 #darkmode-toggle{
   z-index: 2;
@@ -211,20 +216,17 @@ line-height: 2rem; /* 173.913% */
 letter-spacing: 0.46px;
 }
 .container-1__bottom-sub-price--new{
-  color: #FFF;
   font-size: 0.8rem;
   font-style: normal;
   font-weight: 400;
   line-height: 2rem; /* 166.667% */
   letter-spacing: 0.48px;
- 
 }
 .container-1__bottom-sub{
   padding-left: 1rem;
   padding-top: 97px;
 }
 .container-1__bottom-sub-price>span:nth-child(2n){
-color: #FFF;
 font-size: 1rem;
 font-style: normal;
 font-weight: 400;
@@ -546,7 +548,7 @@ display: flex;
 align-self: center;
 }
 .headphone__login-font{
-  padding-left: 41px;
+  padding-left: 24px;
   color: #F14A16;
 font-size: 1rem;
 font-style: normal;
@@ -753,8 +755,7 @@ font-weight: 700;
 }
 .hour__sub>span{
   font-weight: 400;
-  font-size: 1rem;
-  color: white;
+  font-size: 1rem;  
   margin-left: 0.2rem;
 }
 .offer__ending--counter{
@@ -787,16 +788,15 @@ font-weight: 700;
   }
 }
 
+.headset__bigger--circle{
+  text-align: center;
+}
 
 .headset__bigger--circle--image{
   height:100%;
   width: 100%;
 }
 
-.headset__bigger--circle>img{
-  width: 100%;
-  height: 100%;
-}
 .headset__smaller--circle{
 
   left:100px;
@@ -1022,7 +1022,7 @@ letter-spacing: 1.05px;
 .header__mobile-search-box--border{
   border: var(--primary-container3-search-bar-border);
 }
-.container-3__shop--heading{
+.container-3__shop-heading{
   font-weight: 700;
   color: white;
   font-size: 2rem;
@@ -1144,7 +1144,7 @@ letter-spacing: 1.05px;
   overflow: hidden;
 }
 .header__mobile-search-text>span{
-  color: #858585;
+color: #858585;
 font-size: 16px;
 font-style: normal;
 font-weight: 400;
@@ -1169,14 +1169,15 @@ letter-spacing: 0.64px;
   padding-left: 13px;
   z-index: 1;
 }
+
 .container-3-footer{
   display: none;
 }
 .headphone__btn--width{
-  margin-left: -30px;
+  margin-left: -14px;
   margin-top: 49px;
   box-shadow: none;
-  width: 99%;
+  width: 73%;
   transform: translate(50px, -40px);
 }
 .header__mobile-search-box--footer{
@@ -1415,10 +1416,7 @@ text-align: center;
   .exclusive__offer-btn{
     width: 100%;
   }
-  .headphone__btn{
-    width: 231px;
-    
-  }
+
   .playstore{
     width: 100%;
   }
@@ -1462,7 +1460,7 @@ text-align: center;
   .shop--support__image--end{
     left: 16px;
     display: flex;
-    margin-bottom: -132px;
+    margin-bottom: -144px;
     margin-top: -49px;
     position: absolute;
     bottom: 161px;
