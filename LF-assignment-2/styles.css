@@ -717,7 +717,7 @@ letter-spacing: 0.5px;
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  margin-top: -540px;
+  margin-top: -341px;
 }
 
 .exclusive__offer>span{
@@ -1081,6 +1081,7 @@ letter-spacing: 1.05px;
   html {
     font-size: 12px; /* 1rem = 12px */
   }
+
   .header__logo, .header__nav, .header__icons{
     display: none;
   }
@@ -1088,6 +1089,9 @@ letter-spacing: 1.05px;
     width: 100vw;
     display: flex;
     flex-direction: column;
+  }
+  .header__button{
+    display: none;
   }
   .headset__smaller--circle{
     margin-top: 30px;
@@ -1118,9 +1122,6 @@ letter-spacing: 1.05px;
         width: 78%;
         margin-left: 38px;
         margin-top: 20px;
-  }
-  .ontainer-1__bottom-headphone{
-
   }
 
   .search-white-icon{
