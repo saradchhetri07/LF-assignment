@@ -1204,13 +1204,17 @@ letter-spacing: 0.64px;
   display: flex;
   justify-content: center;
 }
+.circular_image{
+  position: relative;
+  transform: translateY(-10px);
+}
 .header_toggle{
   transform: translateX(-150px);
   margin-top: 25px;
 }
-.light-mode .circular_image{
+/* .light-mode .circular_image{
   background-color: #070606;
-}
+} */
 .container-1__left-ellipse-1{
     display: flex
 }
@@ -1230,11 +1234,15 @@ backdrop-filter: blur(15px);
     flex-direction: column;
   }
   .container-1__bottom{
-    display: flex;
-    width: 153%;
-    height: 200px;
-    transform: translateY(10px);
-    margin-left: 30px;
+        display: flex;
+        width: 153%;
+        height: 311px;
+        transform: translateY(10px);
+        margin-left: 30px;
+        overflow: scroll;
+        margin: 0;
+        padding-top: 98px;
+        margin-left: 29px;
   }
   #mobile_btn{
     z-index: 1;
