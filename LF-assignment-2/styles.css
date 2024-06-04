@@ -80,6 +80,9 @@ body.light-mode{
   color: black;
 }
 
+.light-mode .header__mobile-icon>i{
+  color: black;
+}
 .light-mode .container-1__left-ellipse-1{
   background: none;
 }
@@ -211,7 +214,7 @@ letter-spacing: 0.46px;
 }
 .container-1__bottom-sub{
   padding-left: 1rem;
-  padding-top: 7rem;
+  padding-top: 97px;
 }
 .container-1__bottom-sub-price>span:nth-child(2n){
 color: #FFF;
@@ -320,6 +323,7 @@ z-index: 2;
   overflow: scroll;
   padding-bottom: 101px;
   margin-left:38px;
+  margin-right:81px
 }
 .container-2__arrivals{
   margin-top: 10vh;
@@ -375,7 +379,8 @@ object-fit: cover;
 
 }
 .headphone__info--about--padding-left{
-  padding-left: 7%;
+  padding-left: 13px;
+  padding-right: 16px;
 }
 .headphone__info--about--h1{
   margin-top: 17px;
@@ -699,6 +704,7 @@ letter-spacing: 0.5px;
   width: 50%;
   height: 100%;
 }
+
 .container2__offer--exclusive{
   display: flex;
   flex-grow: 1;
@@ -706,8 +712,9 @@ letter-spacing: 0.5px;
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  margin-top: -340px;
+  margin-top: -540px;
 }
+
 .exclusive__offer>span{
 font-size: 2rem;
 font-weight: 700;
@@ -759,13 +766,22 @@ font-weight: 700;
   color: white; 
   margin-left: 2rem;
 }
-/* .headset__bigger--circle{
-  position: relative;
-  height: 60vh;
-  width: 30vw;
-  border-radius: 100%;
-  background-color: var(--primary-container2-blue-background);
-} */
+.headset__bigger--circle>img{
+  animation: growShrink 2s infinite;
+}
+/* * animation added */
+@keyframes growShrink {
+  0% {
+      transform: scale(1);
+  }
+  60% {
+      transform: scale(0.9); /* scale up to 150% */
+  }
+  80% {
+      transform: scale(1); /* back to original size */
+  }
+}
+
 
 .headset__bigger--circle--image{
   height:100%;
@@ -1185,12 +1201,16 @@ letter-spacing: 0.64px;
 }
 .header_toggle{
   transform: translateX(-150px);
+  margin-top: 25px;
 }
 .container-1__left-ellipse-1{
     display: flex
 }
 .container-1__bottom-headphone{
-
+border-radius: 25px;
+border: 1px solid rgba(0, 0, 0, 0.12);
+background: rgba(40, 40, 40, 0.70);
+backdrop-filter: blur(15px);
 }
 .container-1__bottom-headphone>img{
   top: -100px;
