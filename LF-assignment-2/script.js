@@ -1,14 +1,11 @@
-const checkbox = document.getElementById("checkbox");
-checkbox.addEventListener("change", () => {
-  console.log("cliced");
-  document.body.classList.toggle("dark");
-});
+function toggleTheme() {
+  const body = document.querySelector("body");
 
-// const toggleContainer = document.getElementById("toggle-container");
-// const toggleButton = document.getElementById("toggle-button");
-// const body = document.body;
-
-// toggleContainer.addEventListener("click", () => {
-//   body.classList.toggle("dark-mode");
-//   toggleButton.classList.toggle("active");
-// });
+  if (body.classList.contains("light-mode")) {
+    body.classList.remove("light-mode");
+    body.classList.add("dark-mode");
+  } else {
+    body.classList.remove("dark-mode");
+    body.classList.add("light-mode");
+  }
+}
