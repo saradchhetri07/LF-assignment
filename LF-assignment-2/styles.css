@@ -79,6 +79,8 @@ body.light-mode{
   color: black;
 }
 
+
+
 .light-mode .header__mobile-icon>i{
   color: black;
 }
@@ -92,6 +94,7 @@ body.light-mode{
   background: var(--primary-card-background-color);
   background-color: #282828;
 }
+
 #darkmode-toggle{
   z-index: 2;
 }
@@ -279,9 +282,6 @@ margin-left: 1rem;
 .headphone__login--btn{
 width: 20px;
 z-index: 2;
-}
-#header__button{
-
 }
 .container-2__headphones--headphone-1{
   margin-left: 38px;
@@ -490,9 +490,10 @@ letter-spacing: 4.25px;
   z-index: 2;
 }
 .container-1__image{
+  transform: translatex(-81px);
   position: absolute;
-  height: 89vh;
-  width: 55vw;
+  height: 910px;
+  width: 783px;
   top: 51px;
   left: 50%;
   z-index: -1;
@@ -1074,7 +1075,7 @@ letter-spacing: 1.05px;
 
 
 /* Extra small screens */
-@media (max-width: 767px) {
+@media (max-width: 992px) {
   html {
     font-size: 12px; /* 1rem = 12px */
   }
@@ -1204,6 +1205,9 @@ letter-spacing: 0.64px;
 .header_toggle{
   transform: translateX(-150px);
   margin-top: 25px;
+}
+.light-mode .circular_image{
+  background-color: #070606;
 }
 .container-1__left-ellipse-1{
     display: flex
