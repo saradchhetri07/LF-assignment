@@ -70,9 +70,8 @@ body {
   height: 100%;
   background-color: var(--primary-color);
   /* background-color: var(--secondary-color); */
-  transition: background 0.2s linear;
+  transition: background 0.3s linear;
   color: #ffff;
-
 }
 
 body.light-mode{
@@ -185,7 +184,10 @@ background: linear-gradient(116deg, rgba(192, 192, 192, 0.63) -10.88%, rgba(255,
 backdrop-filter: blur(15px);
 }
 .circular_image{
-  display: none;
+  position: absolute;
+  display: flex;
+  transform: translateY(-100px);
+  margin-left: 32px;
 }
 .mobile_exclusive__offer{
   display: none;
@@ -1317,7 +1319,7 @@ backdrop-filter: blur(15px);
     text-align: center;
   }
   .accessories__box--accessory{
-    width: 100%;
+    width: 350%;
   }
   .container-1__left{
     margin-top: 32px;
