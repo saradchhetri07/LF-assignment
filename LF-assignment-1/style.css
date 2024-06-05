@@ -140,7 +140,7 @@
   flex-direction: column;
   flex-wrap: wrap;
 }
-.section__about--heading > div {
+.section__about-heading > div {
   display: flex;
   gap: 1rem;
   width: 100%;
@@ -644,7 +644,7 @@
   font-weight: 500;
   color: #2e2e48;
 }
-#design-tool-para {
+.design-tool-para {
   text-align: center;
 }
 
@@ -722,10 +722,10 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  .section__about--heading {
+  .section__about-heading {
     width: 100%;
   }
-  .section__about--heading > img {
+  .section__about-heading > img {
     width: 10vw;
   }
   .section__about--first-two {
