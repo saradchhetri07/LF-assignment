@@ -1,4 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Proxima+Nova");
+@font-face {
+  font-family: "Proxima Nova";
+  src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot");
+  src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot?#iefix")
+}
+
 :root {
   /* variable for the topmost container block */
   --primary-color: #070606;
@@ -61,7 +67,6 @@
   margin: 0;
   padding: 0;
   font-size: 1rem;
-  font-family: "montserrat",sans-serif;
   box-sizing: border-box;
 }
 
@@ -287,6 +292,7 @@ margin-left: 1rem;
 width: 20px;
 z-index: 2;
 }
+
 .container-2__headphones--headphone-1{
   margin-left: 38px;
 }
@@ -305,9 +311,15 @@ z-index: 2;
   display: flex;
   align-items: center;
 }
+.container__margin-top--70{
+  margin-top: 100px;
+}
+.container__margin-left--38{
+  margin-left: 38px;
+}
 .header__logo {
   padding-top: 2vh;
-  height: 10vh;
+  height: 15vh;
   width: 9vw;
 }
 .header__logo>img{
@@ -322,20 +334,21 @@ z-index: 2;
 
 }
 .container-2__headphones{
-  margin-top: 10vh;
-  width: 100vw;
   display: flex;
   gap: 3vw;
-  overflow: scroll;
+  overflow-x: scroll;
   padding-bottom: 101px;
-  margin-left:38px;
-  margin-right:81px
+  margin-right:81px;
+  width: 94%;
 }
 .container-2__arrivals{
   margin-top: 10vh;
   width: 100vw;
   display: flex;
   gap: 3vw;
+  overflow-x: scroll;
+  padding-left: 100px;
+  padding-right: 50px;
 }
 .headphone__image{
   border: var(--primary-card-border);
@@ -455,7 +468,7 @@ width: 100%;
   display: flex;
   flex-direction: column;
   width: 50%;
-  
+  padding-right: 38px
 }
 #mobile_btn{
   display: none;
@@ -514,6 +527,9 @@ letter-spacing: 4.25px;
 .header__nav-link {
   font-weight: 400;
 }
+.header__nav-link:hover{
+  cursor: pointer;
+}
 #Home {
   border-bottom: 0.0625em solid #fc9918;
 }
@@ -533,6 +549,9 @@ letter-spacing: 4.25px;
   align-items: center;
   padding-right: 8%;
 }
+.headphone__btn:hover{
+  cursor: pointer;
+}
 .headphone__cart--btn{
   /* background-color: green; */
   width: 45%;
@@ -540,13 +559,19 @@ letter-spacing: 4.25px;
   border-radius: 20px;
   box-shadow: var(--primary-cart-box-shadow);
 }
+.button_font{
+  display: flex;
+  text-align: center;
+  width: 100%;
+  padding: 50%;
+}
 .headphone__login--btn{
 width: 3.2%;
 margin-left: 2rem;
 display: flex;
-
 align-self: center;
-}
+margin: 20px;
+} 
 .headphone__login-font{
   padding-left: 24px;
   color: #F14A16;
@@ -563,8 +588,11 @@ letter-spacing: 0.5px;
   box-shadow: var(--primary-container2-buy-box-shadows);
   border: var(--primary-buy-border);
   background-color: var(--primary-container2-buy-color)
-}
 
+}
+.headphone__buy--btn:hover{
+  pointer:cursor;
+}
 .container-1__upper--right{
   opacity: 0.2;
   position: absolute;
@@ -628,8 +656,6 @@ letter-spacing: 0.5px;
 }
 
 .arrivals{
-  width: 80vw;
-  margin-top: 3rem;
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -646,7 +672,6 @@ letter-spacing: 0.5px;
   width: 90vw;
   height: 30vh;
   background: var(--primary-container2-purple-background);
-  margin-top: 20vh;
   border-radius: 25px;
 }
 
@@ -699,12 +724,9 @@ letter-spacing: 0.5px;
 
 /* ^css for exclusive offer div */
 .container2__offer{
-  height: 732px;
   width: 70vw;
-  margin-top: 4rem;
   display: flex;
   position: relative;
-  margin-top: 173px;
 }
 
 .container2__offer--headset{
@@ -719,7 +741,6 @@ letter-spacing: 0.5px;
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  margin-top: -341px;
 }
 
 .exclusive__offer>span{
@@ -1121,6 +1142,7 @@ letter-spacing: 1.05px;
         width: 78%;
         margin-left: 38px;
         margin-top: 20px;
+    width: 94%;
   }
 
   .search-white-icon{
@@ -1156,7 +1178,7 @@ letter-spacing: 0.64px;
 #header__mobile-search-box{
   display: flex;
   height: 50px;
-  width: 80%;
+  width: 90%;
   margin-top: 32.2px;
   margin-left: 38px;
   /* background-color: white; */
@@ -1167,6 +1189,7 @@ letter-spacing: 0.64px;
   align-items: center;
   padding-left: 13px;
   z-index: 1;
+  transform: translateX(-10px);
 }
 
 .container-3-footer{
@@ -1249,6 +1272,7 @@ backdrop-filter: blur(15px);
     z-index: 1;
     display: flex;
     gap: 4px;
+    padding-right: 38px;
   }
   #mobile_btn-shop{
     height: 100%;
@@ -1290,6 +1314,9 @@ backdrop-filter: blur(15px);
   .container-2__headphones--headphone-1{
     /* width: 100%; */
     height: 100%;
+  }
+  .container-2__headphones{
+    overflow-x: scroll;
   }
   .header__mobile{
     display: flex;
@@ -1338,12 +1365,10 @@ backdrop-filter: blur(15px);
   }
   .container-1__left{
     margin-top: 32px;
-    width: 80%;
+    width: 94%;
   }
   .container-2__arrivals{
     margin-right: 10px;
-    width: 300px;
-    height: 91vh;
     overflow: scroll;
   }
 
@@ -1405,6 +1430,11 @@ backdrop-filter: blur(15px);
   }
   .mobile_exclusive__offer{
     text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  .arrivals{
+    width: 100%;
   }
   .mobile_exclusive__offer>span{
     color: white;
@@ -1435,6 +1465,7 @@ text-align: center;
   }
   .container-2__qr--know--info{
     width: 80%;
+    overflow: hidden;
   }
   .header__mobile-search-box--border{
     border: var(--primary-container3-search-bar-border);
