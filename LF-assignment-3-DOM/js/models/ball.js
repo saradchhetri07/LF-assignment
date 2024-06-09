@@ -2,7 +2,7 @@ import { getRandomColor } from "../utils.js";
 
 export default class Ball {
   // * constructor for ball
-  constructor(parent, x = 0, y = 0, w = 150, h = 150, color) {
+  constructor(parent, x = 0, y = 0, w = 30, h = 30, color) {
     this.x = x; // Initial x position of the ball
     this.y = y; // Initial y position of the ball
     this.w = w; // Width of the ball
