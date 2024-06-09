@@ -21,9 +21,9 @@ export default class Circle {
     const distance = v.magnitute();
     if (distance <= this.radius + circle.radius) {
       //* swapping the color with each other
-      let colorTemp = this.color;
-      this.color = circle.color;
-      circle.color = colorTemp;
+      // let colorTemp = this.color;
+      // this.color = circle.color;
+      // circle.color = colorTemp;
 
       const unitNormal = Vector.divide(v, v.magnitute());
       const unitTangent = unitNormal.getTangent();

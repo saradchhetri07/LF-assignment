@@ -14,7 +14,7 @@ const getRandomColor = () => {
 };
 
 const getRandomRadius = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + 10;
+  return Math.floor(Math.random() * (max - min + 1)) + 3;
 };
 
 export { getRandomInt, getRandomColor, getRandomRadius };

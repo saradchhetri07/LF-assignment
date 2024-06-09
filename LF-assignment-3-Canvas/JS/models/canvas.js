@@ -36,7 +36,7 @@ export default class Canvas {
   }
 
   setUp() {
-    const NUMBER_OF_CIRCLES = 100;
+    const NUMBER_OF_CIRCLES = 500;
     this.circlesArray = [];
     for (let i = 0; i < NUMBER_OF_CIRCLES; i++) {
       let circle = new Circle(
