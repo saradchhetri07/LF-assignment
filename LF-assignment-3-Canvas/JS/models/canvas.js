@@ -14,7 +14,8 @@ export default class Canvas {
 
     this.canvas.style.backgroundColor = "white";
     this.canvas.style.height = "80vh";
-    this.canvas.style.width = "70vw";
+    this.canvas.style.border = "5px solid black";
+    this.canvas.style.width = "80vw";
     this.canvas.style.margin = "10%";
 
     this.mousePos = new Vector(0, 0);
