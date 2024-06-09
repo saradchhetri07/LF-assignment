@@ -16,11 +16,11 @@ const BOUNDARY_X_MAX = boxWidth - 30; // Maximum x boundary adjusted to keep bal
 const BOUNDARY_Y_MIN = 0; // Minimum y boundary
 const BOUNDARY_Y_MAX = boxHeight - 30; // Maximum y boundary adjusted to keep ball inside the box
 
-const BALL_COUNT = 100; // Number of balls to be created
+const BALL_COUNT = 800; // Number of balls to be created
 const ballArray = []; // Array to store the ball objects
 
 for (let i = 0; i < BALL_COUNT; i++) {
-  var randomRadius = getRandomInt(50, 150); // Generate a random radius for the ball
+  var randomRadius = getRandomInt(20, 50); // Generate a random radius for the ball
   const ball = new Ball(
     box.element, // The box element where the ball will be added
     getRandomInt(BOUNDARY_X_MIN, BOUNDARY_X_MAX), // Random x position within boundaries

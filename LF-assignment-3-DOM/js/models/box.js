@@ -4,7 +4,7 @@ export default class Box {
     this.element = document.createElement("div"); // Create a new div element
     this.element.id = id; // Set the id of the div element
     this.element.style.border = "20px solid #999"; // Add a border to the div
-    this.element.style.height = "90vh"; // Set the height of the div to 90% of the viewport height
+    this.element.style.height = "2000px"; // Set the height of the div to 90% of the viewport height
     this.element.style.width = "90vw"; // Set the width of the div to 90% of the viewport width
     this.element.style.position = "relative"; // Set the position of the div to relative
     this.element.style.top = "10%"; // Position the div 10% from the top of its containing element

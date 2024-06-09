@@ -8,8 +8,6 @@ const updateBallPosition = (ballArray, box) => {
     const boxWidth = box.element.offsetWidth - 20;
     const boxHeight = box.element.offsetHeight - 40;
 
-    console.log(boxHeight, boxWidth);
-
     // Handle wall collision
     for (let ball of ballArray) {
       try {
@@ -22,7 +20,6 @@ const updateBallPosition = (ballArray, box) => {
           if (ball.x + ball.w > boxWidth) {
             ball.x = boxWidth - ball.w;
           }
-          // playAudio();
         }
         if (ball.y < 0 || ball.y + ball.h > boxHeight) {
           ball.dy = -ball.dy; // Reverse direction in y-axis
@@ -32,7 +29,6 @@ const updateBallPosition = (ballArray, box) => {
           if (ball.y + ball.h > boxHeight) {
             ball.y = boxHeight - ball.h;
           }
-          // playAudio();
         }
       } catch (ballError) {
         console.error(

@@ -13,7 +13,6 @@ const getRandomColor = () => {
   const g = Math.floor(Math.random() * 256);
   const b = Math.floor(Math.random() * 256);
   // Construct CSS color string
-  console.log(`rgb(${r},${g},${b})`);
   return `rgb(${r}, ${g}, ${b})`;
 };
 
