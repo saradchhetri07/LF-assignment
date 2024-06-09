@@ -5,8 +5,8 @@ import { detectBallCollision, handleBallCollision } from "./detectCollision.js";
 const updateBallPosition = (ballArray, box) => {
   try {
     // Get the box dimensions
-    const boxWidth = box.element.offsetWidth - 20;
-    const boxHeight = box.element.offsetHeight - 40;
+    const boxWidth = box.element.offsetWidth - 5;
+    const boxHeight = box.element.offsetHeight - 5;
 
     // Handle wall collision
     for (let ball of ballArray) {

@@ -10,8 +10,8 @@ export default class Ball {
 
     this.color = color || getRandomColor(); // Use the provided color or a random color if not provided
 
-    this.dx = 8; // Velocity along the x-axis
-    this.dy = 8; // Velocity along the y-axis
+    this.dx = 2; // Velocity along the x-axis
+    this.dy = 2; // Velocity along the y-axis
 
     this.element = document.createElement("div"); // Create a new div element for the ball
 
@@ -23,7 +23,10 @@ export default class Ball {
     this.element.style.borderRadius = "50%"; // Make the ball element round
     this.element.style.position = "absolute"; // Set the position to absolute
     this.element.style.background = `${this.color}`; // Set the background color of the ball element
-    this.element.addEventListener("click", () => {}); // Add a click event listener (empty function)
+    this.element.addEventListener("mouseover", () => {
+      this.dx *= -4;
+      this.dy *= -4;
+    }); // Add a click event listener (empty function)
 
     parent.appendChild(this.element); // Append the ball element to the parent element
   }

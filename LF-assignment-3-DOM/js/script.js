@@ -20,7 +20,7 @@ const BALL_COUNT = 800; // Number of balls to be created
 const ballArray = []; // Array to store the ball objects
 
 for (let i = 0; i < BALL_COUNT; i++) {
-  var randomRadius = getRandomInt(20, 50); // Generate a random radius for the ball
+  var randomRadius = getRandomInt(10, 20); // Generate a random radius for the ball
   const ball = new Ball(
     box.element, // The box element where the ball will be added
     getRandomInt(BOUNDARY_X_MIN, BOUNDARY_X_MAX), // Random x position within boundaries
