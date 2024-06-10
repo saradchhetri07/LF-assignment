@@ -67,6 +67,13 @@ const initSlider = () => {
 
   return { slider, valueDisplay, getSlider };
 };
+const getRandomVelocity = () => {
+  if (Math.random() > 0.5) {
+    return Math.floor(Math.random() * 8 + 2) * -1;
+  } else {
+    return Math.floor(Math.random() * 8 + 2);
+  }
+};
 
 export {
   getRandomInt,
@@ -74,4 +81,5 @@ export {
   detectCollision,
   getRandomRadius,
   initSlider,
+  getRandomVelocity,
 };

@@ -1,8 +1,8 @@
-import { getRandomColor } from "../utils.js";
+import { getRandomColor, getRandomVelocity } from "../utils.js";
 
 export default class Ball {
   // * constructor for ball
-  constructor(parent, x = 0, y = 0, w = 30, h = 30, color) {
+  constructor(parent, x = 0, y = 0, vx, vy, w = 30, h = 30, color) {
     this.x = x; // Initial x position of the ball
     this.y = y; // Initial y position of the ball
     this.w = w; // Width of the ball
@@ -10,8 +10,8 @@ export default class Ball {
 
     this.color = color || getRandomColor(); // Use the provided color or a random color if not provided
 
-    this.dx = 2; // Velocity along the x-axis
-    this.dy = 2; // Velocity along the y-axis
+    this.dx = vx; // Velocity along the x-axis
+    this.dy = vy; // Velocity along the y-axis
 
     this.element = document.createElement("div"); // Create a new div element for the ball
 

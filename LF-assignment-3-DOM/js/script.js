@@ -1,7 +1,7 @@
 //* Imports
 import Box from "./models/box.js"; // Box class
 import Ball from "./models/ball.js"; // Ball class
-import { getRandomInt, initSlider } from "./utils.js"; // Utility functions
+import { getRandomInt, getRandomVelocity, initSlider } from "./utils.js"; // Utility functions
 import { updateBallPosition } from "./controllers/updateBallPosition.js"; // Update ball position function
 
 //* Box instantiation
@@ -33,9 +33,12 @@ function createBalls(BALL_COUNT, balls, box) {
       box.element,
       getRandomInt(BOUNDARY_X_MIN, BOUNDARY_X_MAX),
       getRandomInt(BOUNDARY_Y_MIN, BOUNDARY_Y_MAX),
+      getRandomVelocity(),
+      getRandomVelocity(),
       randomRadius,
       randomRadius
     );
+    console.log(ball);
     balls.push(ball);
   }
 }
