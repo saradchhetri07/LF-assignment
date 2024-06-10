@@ -45,9 +45,9 @@ const initSlider = () => {
   const slider = document.createElement("input");
   slider.type = "range";
   slider.id = "ballCount";
-  slider.min = "10";
+  slider.min = "0";
   slider.max = "1200";
-  slider.value = "40";
+  slider.value = "0";
   sliderContainer.appendChild(slider);
 
   // Create the value display element
