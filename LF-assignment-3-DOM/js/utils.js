@@ -29,4 +29,49 @@ const getRandomRadius = () => {
   return Math.floor(Math.random() * 150);
 };
 
-export { getRandomInt, getRandomColor, detectCollision, getRandomRadius };
+const initSlider = () => {
+  // Create a slider element container
+  const sliderContainer = document.createElement("div");
+  sliderContainer.style.marginTop = "20px";
+  sliderContainer.style.display = "flex";
+  sliderContainer.style.alignItems = "center";
+
+  const label = document.createElement("label");
+  label.htmlFor = "ballCount";
+  label.innerText = "Ball Count: ";
+  sliderContainer.appendChild(label);
+
+  // Create the slider element
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.id = "ballCount";
+  slider.min = "10";
+  slider.max = "1200";
+  slider.value = "40";
+  sliderContainer.appendChild(slider);
+
+  // Create the value display element
+  const valueDisplay = document.createElement("span");
+  valueDisplay.id = "sliderValue";
+  valueDisplay.innerText = slider.value;
+  valueDisplay.style.marginLeft = "10px"; // Add some space between the slider and the value
+  sliderContainer.appendChild(valueDisplay);
+
+  // Append the slider container to the document body
+  document.body.appendChild(sliderContainer);
+
+  // Function to get the current slider value
+  function getSlider() {
+    return parseInt(slider.value, 10);
+  }
+
+  return { slider, valueDisplay, getSlider };
+};
+
+export {
+  getRandomInt,
+  getRandomColor,
+  detectCollision,
+  getRandomRadius,
+  initSlider,
+};
