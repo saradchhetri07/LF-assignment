@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Start Page</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="start-container">
+        <h1>Game Over</h1>
+        <h3 id="score-display">YOUR SCORE:</h3>
+        <h3 id="highest-score">HIGHEST SCORE:</h3>
+        <button id="retry-btn" onclick="restartGame()">
+            <i class="fa fa-repeat" aria-hidden="true" id="retryButton"></i>
+        </button>
+    </div>
+
+    <script>
+        function restartGame() {
+            window.location.href = 'game.html'; // Redirect to your game page
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Retrieve the score from localStorage
+            const score = localStorage.getItem('localScore');
+            const highestScore = localStorage.getItem('highestScore');
+
+
+            // Display the score
+            if (score) {
+                const scoreDisplay = document.getElementById('score-display');
+                if (scoreDisplay) {
+                    console.log(score);
+                    scoreDisplay.textContent = `Your Score: ${score}`;
+                }
+            }
+            if (highestScore) {
+                const highestScoreDisplay = document.getElementById('highest-score');
+                if (highestScoreDisplay) {
+                    highestScoreDisplay.textContent = `HIGHEST SCORE: ${highestScore}`;
+                }
+            }
+            const retryButton = document.getElementById('retry-btn');
+            if (retryButton) {
+                retryButton.style.padding = '20px 40px';
+                retryButton.style.fontSize = '24px';
+            }
+        });
+    </script>
+</body>
+
+</html>
