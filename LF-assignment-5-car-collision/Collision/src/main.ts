@@ -139,7 +139,7 @@ function draw() {
   scoreCtx.font = "30px 'Press Start 2P', cursive";
   scoreCtx.fillText(`Score: ${score}`, 20, 30);
   scoreCtx.fillText(`Highest Score: ${highestScore}`, 20, 60);
-  scoreCtx.fillText(`Ammo number: ${maxAmmo}`, 20, 90);
+  scoreCtx.fillText("press space to hit AMMO", 20, 90);
   requestAnimationFrame(draw);
 }
 
