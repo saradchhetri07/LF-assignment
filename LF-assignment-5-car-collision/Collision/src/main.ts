@@ -56,11 +56,11 @@ function draw() {
   cars.forEach((car, carIndex) => {
     ctx.drawImage(car.image, car.x, car.y, car.width, car.height);
 
-    SPEED_DETECTOR = SPEED * speed;
+    SPEED_DETECTOR = SPEED * (speed / 2);
     car.y += SPEED_DETECTOR;
 
     if (car.y > DIMENSIONS.CANVAS_HEIGHT) {
-      car.y = getRandomInt(-100, 0);
+      generateNewPosition(car);
 
       let randomLane;
       do {
@@ -155,6 +155,17 @@ function checkOverlap(car: CarImage, otherCars: CarImage[]) {
       car.y + car.height > otherCar.y
     );
   });
+}
+
+// newly generated position with positions of other cars to ensure fair obstacle generation
+function generateNewPosition(car: CarImage) {
+  let newPosition = getRandomInt(-500, 0);
+  cars.forEach((el) => {
+    if (Math.abs(newPosition - el.y) < DIMENSIONS.CAR_HEIGHT * 3) {
+      newPosition -= DIMENSIONS.CAR_HEIGHT * 3;
+    }
+  });
+  car.y = newPosition;
 }
 
 //resetting the default values and transiting to gameover file
