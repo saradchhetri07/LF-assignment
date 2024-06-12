@@ -113,7 +113,6 @@ input[type="range"] {
 
 button:hover {
   background-color: #ae6d6d;
-  /* transform: scale(1.5); */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
