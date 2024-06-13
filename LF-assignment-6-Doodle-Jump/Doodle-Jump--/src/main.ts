@@ -71,6 +71,7 @@ function createInitialPlatforms() {
     true,
     jetpack
   );
+
   platforms.push(platform);
   for (let i = 1; i < 10; i++) {
     let randomX =
@@ -178,7 +179,7 @@ function draw() {
       player.velocityY > 0
     ) {
       if (!platform.isgoodPlatform) {
-        cancelAnimationFrame(animationId);
+        score -= 300;
       }
       //check if jet pack is present
       if (platform.hasJetPack) {
@@ -193,6 +194,10 @@ function draw() {
     }
   });
 
+  //if exceed vertically redirect to first platform
+  if (player.y < 0) {
+    player.y = platforms[1].y - player.height;
+  }
   // Clear platforms and add new ones
   while (platforms.length > 0 && platforms[0].y >= DIMENSIONS.CANVAS_HEIGHT) {
     player.isInitial = false;
