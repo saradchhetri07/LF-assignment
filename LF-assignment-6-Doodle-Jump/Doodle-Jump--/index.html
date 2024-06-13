@@ -6,15 +6,32 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vite + TS</title>
-
+  <link rel="stylesheet" href="./src/style.css">
 </head>
 
 <body>
   <canvas id="board"></canvas>
   <div class="container">
-    <button id="startButton">Start Game</button>
+    <div id="instruction">
+      <h1>DOODLE JUMP</h1>
+      <h2>Use LEFT ARROW to move left</h2> <br>
+      <h2>use RIGHT ARROW to move right</h2><br>
+      <h2>
+        Don't cross ceiling or it's
+        <strong class="warning">
+          GAME OVER
+        </strong>
+      </h2>
+    </div>
+    <br>
+
+    <button id="proceed" onclick="startGame()">Proceed To Game</button>
   </div>
-  <script type="module" src="/src/main.ts"></script>
+  <script>
+    function startGame() {
+      window.location.href = 'start.html'; // Redirect to your game page
+    }
+  </script>
 </body>
 
 </html>

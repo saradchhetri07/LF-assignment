@@ -21,7 +21,7 @@ background.src = bg;
 
 const startButton = document.getElementById("startButton") as HTMLElement;
 const jumpSound = new Audio(jumpSoundUrl);
-// const fallSound = new Audio(fallSoundUrl);
+const fallSound = new Audio(fallSoundUrl);
 let isPaused = false;
 
 let score = 0;
@@ -125,13 +125,13 @@ function draw() {
     );
     return; // Do not proceed with the game drawing logic
   }
-  // if (player.velocityY < 0) {
-  //   fallSound.play();
+  if (player.velocityY < 0) {
+    fallSound.play();
 
-  //   if (player.y < DIMENSIONS.CANVAS_HEIGHT) {
-  //     fallSound.pause();
-  //   }
-  // }
+    if (player.y < DIMENSIONS.CANVAS_HEIGHT) {
+      fallSound.pause();
+    }
+  }
   platforms.forEach((platform) => {
     if (score >= 300) {
       platform.isMoving = true;
