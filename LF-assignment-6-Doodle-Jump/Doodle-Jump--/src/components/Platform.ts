@@ -47,7 +47,6 @@ export class Platform implements IPlatform {
     this.jetPackImage.src = jetPackImageSrc;
   }
 
-  putJetPack(ctx: CanvasRenderingContext2D): void {}
   draw(ctx: CanvasRenderingContext2D, score: number): void {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 

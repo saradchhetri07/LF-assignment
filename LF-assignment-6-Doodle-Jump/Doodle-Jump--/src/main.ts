@@ -28,7 +28,6 @@ let isPaused = false;
 
 let score = 0;
 let maxScore = 0;
-let animationId = 0;
 let highScore = localStorage.getItem("highScore")
   ? parseInt(localStorage.getItem("highScore")!)
   : 0;
@@ -225,7 +224,7 @@ function draw() {
 
   if (!gameOver) {
     if (gameStarted) {
-      animationId = requestAnimationFrame(draw);
+      requestAnimationFrame(draw);
     } else {
       ctx.drawImage(
         background,
