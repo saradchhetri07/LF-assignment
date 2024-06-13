@@ -1,6 +1,6 @@
 export const DIMENSIONS = {
-  CANVAS_WIDTH: 700,
-  CANVAS_HEIGHT: 900,
+  CANVAS_WIDTH: 500,
+  CANVAS_HEIGHT: 700,
 };
 
 export const PLAYER = {

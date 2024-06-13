@@ -37,7 +37,7 @@ export class Platform implements IPlatform {
     if (score >= 500 && this.isMoving) {
       this.x += 2 * this.direction;
       if (this.x <= 0 || this.x + this.width >= DIMENSIONS.CANVAS_WIDTH) {
-        this.direction *= -2; // Change direction
+        this.direction *= -1; // Change direction
       }
     }
   }
