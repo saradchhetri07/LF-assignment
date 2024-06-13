@@ -212,7 +212,7 @@ function draw() {
 }
 
 function updateScore(): void {
-  let points = Math.floor(50 * Math.random());
+  let points = Math.floor(100 * Math.random());
   if (player.velocityY < 0) {
     maxScore += points;
     if (score < maxScore) {

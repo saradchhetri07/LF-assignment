@@ -1,5 +1,4 @@
 import { DIMENSIONS, PLATFORM } from "../constant";
-import { getRandomInt } from "../utils/common";
 
 export interface IPlatform {
   x: number;
