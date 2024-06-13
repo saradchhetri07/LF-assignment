@@ -86,14 +86,6 @@ export class Player implements IPlayer {
       this.velocityY = this.bounceStrength; // Automatically bounce
       this.isJumping = true;
     }
-
-    //check for upward collision
-    // Prevent player from moving out of canvas bounds horizontally
-    // Wrap around canvas horizontally
-    if (this.y < 0) {
-      //game is over
-      this.y = DIMENSIONS.CANVAS_HEIGHT;
-    }
   }
 
   draw(ctx: CanvasRenderingContext2D): void {

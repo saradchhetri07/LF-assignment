@@ -6,6 +6,8 @@ import platformImage from "./assets/platform.png";
 import { Player, IPlayer } from "./components/Player";
 import { Platform, IPlatform } from "./components/Platform";
 import { getRandomInt } from "./utils/common";
+import jetpack from "./assets/jetpack.png";
+import badPlatform from "./assets/bad-platform.png";
 import jumpSoundUrl from "./assets/jump.mp3";
 import fallSoundUrl from "./assets/fall.mp3";
 
@@ -26,6 +28,7 @@ let isPaused = false;
 
 let score = 0;
 let maxScore = 0;
+let animationId = 0;
 let highScore = localStorage.getItem("highScore")
   ? parseInt(localStorage.getItem("highScore")!)
   : 0;
@@ -55,12 +58,19 @@ function initializeGame() {
 const platforms: IPlatform[] = [];
 const MAX_VERTICAL_GAP = 90; // Maximum vertical gap that the player can jump
 const MAX_HORIZONTAL_GAP = 150; // Maximum horizontal gap that the player can jump
-
+// Add a variable to track the camera offset
 function createInitialPlatforms() {
   const initialY = DIMENSIONS.CANVAS_HEIGHT - PLAYER.HEIGHT;
   const initialX = DIMENSIONS.CANVAS_WIDTH / 2 - PLAYER.WIDTH / 2;
 
-  let platform = new Platform(initialX, initialY, platformImage);
+  let platform = new Platform(
+    initialX,
+    initialY,
+    platformImage,
+    false,
+    true,
+    jetpack
+  );
   platforms.push(platform);
   for (let i = 1; i < 10; i++) {
     let randomX =
@@ -72,7 +82,10 @@ function createInitialPlatforms() {
     let platform = new Platform(
       randomX,
       initialY - (PLATFORM.HEIGHT + PLATFORM.MIN_DISTANCE) * i,
-      platformImage
+      platformImage,
+      false,
+      true,
+      jetpack
     );
     platforms.push(platform);
   }
@@ -87,14 +100,24 @@ function newPlatform() {
     0,
     Math.min(randomX, DIMENSIONS.CANVAS_WIDTH - PLATFORM.WIDTH)
   );
+
+  // 30% chance for the platform to have a jetpack
+  const hasJetPack = Math.random() < 0.2;
+  const isBadPlatform = Math.random() < 0.3;
   let platform = new Platform(
     randomX,
     lastPlatformY -
       PLATFORM.HEIGHT -
       PLATFORM.MIN_DISTANCE -
       getRandomInt(50, MAX_VERTICAL_GAP),
-    platformImage
+    isBadPlatform ? badPlatform : platformImage,
+    hasJetPack,
+    isBadPlatform,
+    jetpack
   );
+  // if (platforms[length - 1].isgoodPlatform && !isBadPlatform) {
+  //   platforms.push(platform);
+  // }
   platforms.push(platform);
 }
 
@@ -133,6 +156,7 @@ function draw() {
     }
   }
   platforms.forEach((platform) => {
+    //logic for moving the platform
     if (score >= 300) {
       platform.isMoving = true;
       platform.draw(ctx, score);
@@ -140,8 +164,9 @@ function draw() {
       platform.isMoving = false;
       platform.draw(ctx, score);
     }
+
     if (player.velocityY < 0 && player.y < (DIMENSIONS.CANVAS_HEIGHT * 3) / 4) {
-      platform.y -= player.velocityY; // Sliding the platform down
+      platform.y -= player.velocityY * 3; // Sliding the platform down
     }
 
     // Collision detection
@@ -152,7 +177,17 @@ function draw() {
       player.x < platform.x + platform.width &&
       player.velocityY > 0
     ) {
-      player.velocityY = player.bounceStrength; // Automatically bounce
+      if (!platform.isgoodPlatform) {
+        cancelAnimationFrame(animationId);
+      }
+      //check if jet pack is present
+      if (platform.hasJetPack) {
+        player.velocityY = player.bounceStrength * 1.2;
+        platform.hasJetPack = false;
+        platform.y -= player.velocityY;
+      } else {
+        player.velocityY = player.bounceStrength;
+      }
       player.isJumping = false;
       jumpSound.play();
     }
@@ -163,7 +198,9 @@ function draw() {
     player.isInitial = false;
     updateScore();
     platforms.shift();
-    newPlatform();
+    for (let i = 0; i < 20; i++) {
+      newPlatform();
+    }
   }
 
   // Update score
@@ -183,7 +220,7 @@ function draw() {
 
   if (!gameOver) {
     if (gameStarted) {
-      requestAnimationFrame(draw);
+      animationId = requestAnimationFrame(draw);
     } else {
       ctx.drawImage(
         background,

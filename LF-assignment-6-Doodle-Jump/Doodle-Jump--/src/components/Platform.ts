@@ -1,5 +1,4 @@
 import { DIMENSIONS, PLATFORM } from "../constant";
-
 export interface IPlatform {
   x: number;
   y: number;
@@ -8,6 +7,9 @@ export interface IPlatform {
   image: HTMLImageElement;
   direction: number;
   isMoving: boolean;
+  hasJetPack: boolean;
+  isgoodPlatform: boolean;
+  jetPackImage: HTMLImageElement;
   draw(ctx: CanvasRenderingContext2D, score: number): void;
 }
 
@@ -20,7 +22,17 @@ export class Platform implements IPlatform {
   isMoving: boolean;
   image: HTMLImageElement;
   direction: number;
-  constructor(x: number, y: number, imageUrl: string) {
+  jetPackImage: HTMLImageElement;
+  hasJetPack: boolean;
+  isgoodPlatform: boolean;
+  constructor(
+    x: number,
+    y: number,
+    imageUrl: string,
+    jetPackPresent: boolean,
+    isgood: boolean,
+    jetPackImageSrc: string
+  ) {
     this.x = x;
     this.y = y;
     this.width = PLATFORM.WIDTH;
@@ -29,10 +41,25 @@ export class Platform implements IPlatform {
     this.image.src = imageUrl;
     this.isMoving = false;
     this.direction = 1;
+    this.hasJetPack = jetPackPresent;
+    this.isgoodPlatform = isgood;
+    this.jetPackImage = new Image();
+    this.jetPackImage.src = jetPackImageSrc;
   }
 
+  putJetPack(ctx: CanvasRenderingContext2D): void {}
   draw(ctx: CanvasRenderingContext2D, score: number): void {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+
+    if (this.hasJetPack) {
+      ctx.drawImage(
+        this.jetPackImage,
+        this.x + this.width / 2 - 15,
+        this.y - 30,
+        20,
+        30
+      );
+    }
 
     if (score >= 500 && this.isMoving) {
       this.x += 2 * this.direction;
