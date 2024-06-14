@@ -114,6 +114,7 @@ export class Player implements IPlayer {
     if (this.isInitial && this.y > DIMENSIONS.CANVAS_HEIGHT - this.height) {
       this.y = DIMENSIONS.CANVAS_HEIGHT - this.height;
       this.velocityY = this.bounceStrength; // Automatically bounce
+      this.isInitial = false;
       this.isJumping = true;
     }
   }
