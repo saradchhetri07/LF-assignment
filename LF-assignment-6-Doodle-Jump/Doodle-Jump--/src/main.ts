@@ -57,7 +57,7 @@ function initializeGame() {
 const platforms: IPlatform[] = [];
 const MAX_VERTICAL_GAP = 90; // Maximum vertical gap that the player can jump
 const MAX_HORIZONTAL_GAP = 150; // Maximum horizontal gap that the player can jump
-// Add a variable to track the camera offset
+
 function createInitialPlatforms() {
   const initialY = DIMENSIONS.CANVAS_HEIGHT - PLAYER.HEIGHT;
   const initialX = DIMENSIONS.CANVAS_WIDTH / 2 - PLAYER.WIDTH / 2;
