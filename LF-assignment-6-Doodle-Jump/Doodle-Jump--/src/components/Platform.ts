@@ -1,4 +1,8 @@
 import { DIMENSIONS, PLATFORM } from "../constant";
+
+/**
+ * Interface for the Platform class defining its properties and methods.
+ */
 export interface IPlatform {
   x: number;
   y: number;
@@ -13,7 +17,10 @@ export interface IPlatform {
   draw(ctx: CanvasRenderingContext2D, score: number): void;
 }
 
-// Implement the Platform class
+/**
+ * Platform class representing a platform in the game.
+ * Implements the IPlatform interface.
+ */
 export class Platform implements IPlatform {
   x: number;
   y: number;
@@ -25,6 +32,16 @@ export class Platform implements IPlatform {
   jetPackImage: HTMLImageElement;
   hasJetPack: boolean;
   isgoodPlatform: boolean;
+
+  /**
+   * Constructor for creating a new Platform instance.
+   * @param x Initial x-coordinate of the platform.
+   * @param y Initial y-coordinate of the platform.
+   * @param imageUrl URL of the image for the platform.
+   * @param jetPackPresent Boolean indicating if the platform has a jetpack.
+   * @param isgood Boolean indicating if the platform is a good platform.
+   * @param jetPackImageSrc URL of the image for the jetpack.
+   */
   constructor(
     x: number,
     y: number,
@@ -47,9 +64,15 @@ export class Platform implements IPlatform {
     this.jetPackImage.src = jetPackImageSrc;
   }
 
-  draw(ctx: CanvasRenderingContext2D, score: number): void {
+  /**
+   * Draw the platform on the canvas context provided.
+   * @param ctx The canvas rendering context.
+   * @param score Current score used for additional drawing logic.
+   */
+  draw(ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 
+    // Draw jetpack if the platform has it
     if (this.hasJetPack) {
       ctx.drawImage(
         this.jetPackImage,
@@ -60,10 +83,10 @@ export class Platform implements IPlatform {
       );
     }
 
-    if (score >= 500 && this.isMoving) {
+    if (this.isMoving) {
       this.x += 2 * this.direction;
       if (this.x <= 0 || this.x + this.width >= DIMENSIONS.CANVAS_WIDTH) {
-        this.direction *= -1; // Change direction
+        this.direction *= -1; // Reverse direction
       }
     }
   }
