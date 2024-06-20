@@ -1,53 +1,63 @@
-import { gameState } from "./../interfaces/interface";
+import { Kunai } from "./kunai";
+import { Position, gameState } from "./../interfaces/interface";
 import {
   CANVAS_DIMENSIONS,
   NINJA_CONSTANT,
   NINJA_SPRITE_IDLE,
 } from "./../constants/constants";
-import { DIMENSIONS } from "./../../../../LF-assignment-5-car-collision/Collision/src/constants";
 import { Player } from "./player";
 import { BaseEnemy } from "./enemy";
 import { HUD } from "./hud";
 import { InputHandler } from "./inputHandler";
-import { SoundManager } from "./soundManager";
 import { LevelManager } from "./levelManager";
 import { Drawable, Updatable } from "../interfaces/interface";
-import playerIdleImage from "../assets/Images/player/ninjaBoyIdle.png";
 import playerRunImage from "../assets/Images/player/ninjaBoyRunning.png";
+import { checkCollisions } from "../utils/collisionDetection";
+import { AnimationState } from "../enums/animationStateEnum";
+import { Assets } from "../utils/audioLoad";
+import { drawPauseScreen } from "../utils/pauseScreen";
+
 /**
  * Class representing the main game.
  */
 export class Game implements Drawable {
-  //steps to perform in game class
-  //check current level
-  //change the background as per current level;
-  //initialize all the enemies of current level with power and player with 100 % health
-  //intialize the HUD
   private player: Player;
-  private enemy: BaseEnemy; // Assuming you have one enemy for demonstration
+  private enemy: BaseEnemy; // Assuming one enemy
   gameState = gameState.isActive;
   private hud: HUD;
   private inputHandler1: InputHandler;
   private inputHandler2: InputHandler;
-  private soundManager: SoundManager;
   private animationId: number = 0;
   private levelManager: LevelManager;
-
   private lastTime: number;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  isPaused: boolean = false; // Initialize isPaused to false
+  private kunai: Kunai[] = [];
+  private hasKunaiLeft: boolean = false;
+  private assets: Assets;
+  private animationFrameId: number | null;
 
   /**
    * Create a new game.
    * @param {HTMLCanvasElement} canvas - The canvas element to draw the game on.
    * @param {CanvasRenderingContext2D} context - The drawing context.
+   * @param {Assets} assets - The loaded assets for the game.
    */
-  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    assets: Assets
+  ) {
     this.canvas = canvas;
     this.context = context;
+    this.assets = assets;
 
     this.levelManager = new LevelManager();
     const currentLevel = this.levelManager.loadCurrentLevel();
+
+    this.animationFrameId = null;
+    this.isPaused = false;
 
     this.player = new Player(
       {
@@ -67,30 +77,35 @@ export class Game implements Drawable {
     );
 
     this.enemy = currentLevel.getCurrentEnemy();
-
     console.log(`enemy is ${this.enemy}`);
 
     this.hud = new HUD(this.player, this.enemy);
 
-    this.inputHandler1 = new InputHandler(this.player, {
-      ArrowLeft: "moveLeft",
-      ArrowRight: "moveRight",
-      ArrowUp: "moveUp",
-      a: "Attack",
-      s: "ThrowWeapon",
-      // d: "Poke",
-    });
+    this.inputHandler1 = new InputHandler(
+      this.player,
+      {
+        ArrowLeft: "moveLeft",
+        ArrowRight: "moveRight",
+        ArrowUp: "moveUp",
+        a: "Attack",
+        s: "ThrowWeapon",
+        p: "pause",
+      },
+      this
+    );
 
-    this.inputHandler2 = new InputHandler(this.enemy, {
-      j: "moveLeft",
-      l: "moveRight",
-      i: "moveUp",
-      z: "Attack",
-      x: "ThrowWeapon",
-      // c: "Poke",
-    });
+    this.inputHandler2 = new InputHandler(
+      this.enemy,
+      {
+        j: "moveLeft",
+        l: "moveRight",
+        i: "moveUp",
+        z: "Attack",
+        x: "ThrowWeapon",
+      },
+      this
+    );
 
-    this.soundManager = new SoundManager();
     this.lastTime = 0;
   }
 
@@ -99,7 +114,50 @@ export class Game implements Drawable {
    */
   start(): void {
     if (this.gameState == gameState.isActive) {
-      requestAnimationFrame(this.gameLoop.bind(this));
+      this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
+    }
+  }
+
+  /**
+   * Pause the game.
+   */
+  pause(): void {
+    this.isPaused = true;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    drawPauseScreen(
+      this.context,
+      this.canvas,
+      this.player.health,
+      this.player.kunaiCount
+    );
+  }
+
+  /**
+   * Resume the game.
+   */
+  resume(): void {
+    this.isPaused = false;
+    this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
+    const resumeButton = document.getElementById(
+      "resumeButton"
+    ) as HTMLButtonElement;
+    if (resumeButton) {
+      resumeButton.style.display = "none";
+    }
+  }
+
+  /**
+   * Toggle the pause state of the game.
+   */
+  togglePause(): void {
+    console.log("came to toggle pause");
+
+    if (this.isPaused) {
+      this.resume();
+    } else {
+      this.pause();
     }
   }
 
@@ -108,12 +166,14 @@ export class Game implements Drawable {
    * @param {number} timestamp - The current time.
    */
   private gameLoop(timestamp: number): void {
+    if (this.isPaused) return; // Early exit if paused
+
     const deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
 
     this.draw();
     this.update(deltaTime);
-    this.animationId = requestAnimationFrame(this.gameLoop.bind(this));
+    this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this)); // Store the animation frame ID
   }
 
   /**
@@ -124,71 +184,89 @@ export class Game implements Drawable {
     this.player.draw(this.context);
     this.player.update(deltaTime);
 
-    this.enemy.draw(this.context);
+    if (!this.enemy.isDead) {
+      this.enemy.draw(this.context);
+    }
     this.enemy.update(deltaTime);
 
-    if (
-      !this.player.isDead &&
-      !this.enemy.isDead &&
-      this.checkCollisions() &&
-      this.player.isAttacking &&
-      this.legitHit()
-    ) {
-      console.log(this.enemy.health);
-      this.enemy.decreaseHealth(this.player.damageLevel);
-    }
-
-    if (
-      !this.player.isDead &&
-      !this.enemy.isDead &&
-      this.checkCollisions() &&
-      this.enemy.isAttacking &&
-      this.legitHit()
-    ) {
-      console.log("health is", this.player.health);
-      this.player.decreaseHealth(this.enemy.damageLevel);
-    }
-
-    //game over if player is dead
-    if (this.player.isDead) {
-      //stop the game
-      cancelAnimationFrame(this.animationId);
-    }
-
-    //draw HUD at the top
+    this.handleCollisions();
+    this.updateKunais(deltaTime);
     this.hud.draw(this.context);
   }
 
-  legitHit(): boolean {
-    if (this.player.isTurningLeft && this.enemy.isTurningRight) {
-      return false;
+  /**
+   * Handle collisions between game objects.
+   */
+  private handleCollisions(): void {
+    if (
+      !this.player.isDead &&
+      !this.enemy.isDead &&
+      checkCollisions(this.player, this.enemy)
+    ) {
+      if (this.player.isAttacking && this.legitHit()) {
+        console.log(this.enemy.health);
+        this.enemy.decreaseHealth(this.player.damageLevel);
+      }
+      if (this.enemy.isAttacking && this.legitHit()) {
+        this.player.decreaseHealth(this.enemy.damageLevel);
+      }
     }
-    return true;
   }
+
+  /**
+   * Update and draw each kunai weapon.
+   * @param {number} deltaTime - The time elapsed since the last update.
+   */
+  private updateKunais(deltaTime: number): void {
+    if (
+      this.player.animationState == AnimationState.ThrowWeapon &&
+      !this.hasKunaiLeft &&
+      this.player.kunaiCount > 0
+    ) {
+      const newKunai = new Kunai(
+        this.player.position.x +
+          (this.player.isTurningRight ? this.player.size.width : 0),
+        this.player.position.y + this.player.size.height / 2.5,
+        this.player.kunaiCount,
+        this.player.isTurningRight
+      );
+      this.kunai.push(newKunai);
+      this.player.kunaiCount--;
+      this.hasKunaiLeft = true;
+    }
+
+    this.kunai.forEach((kunai, index) => {
+      kunai.update(deltaTime, this.player.isTurningRight);
+      kunai.display(this.context);
+
+      if (
+        kunai.position.x < 0 ||
+        kunai.position.x > CANVAS_DIMENSIONS.CANVAS_WIDTH ||
+        checkCollisions(kunai, this.enemy)
+      ) {
+        this.hasKunaiLeft = false;
+        this.kunai.splice(index, 1);
+        if (checkCollisions(kunai, this.enemy)) {
+          this.enemy.decreaseHealth(kunai.damageLevel);
+        }
+      }
+    });
+  }
+
+  /**
+   * Determine if the hit is legitimate based on direction.
+   * @returns {boolean} - True if the hit is legitimate, false otherwise.
+   */
+  private legitHit(): boolean {
+    return !(this.player.isTurningLeft && this.enemy.isTurningRight);
+  }
+
   /**
    * Draw the game state to the canvas.
    */
   draw(): void {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    //this method will get the current level
     const currentLevel = this.levelManager.loadCurrentLevel();
     currentLevel.draw(this.context);
-  }
-
-  /**
-   * Check for collisions between game objects.
-   */
-  private checkCollisions(): boolean {
-    // Implement collision detection and handling logic
-    if (
-      this.player.position.x < this.enemy.position.x + this.enemy.size.width &&
-      this.player.position.x + this.player.size.width > this.enemy.position.x &&
-      this.player.position.y < this.enemy.position.y + this.enemy.size.height &&
-      this.player.position.y + this.player.size.height > this.enemy.position.y
-    ) {
-      // Collision detected!
-      return true;
-    }
-    return false;
   }
 }

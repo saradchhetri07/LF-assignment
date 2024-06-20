@@ -55,7 +55,6 @@ export class LevelManager {
    * @returns {Level} - The current level.
    */
   loadCurrentLevel(): Level {
-    console.log(`current level is ${this.currentLevel}`);
     return this.levels[this.currentLevel - 1];
   }
 

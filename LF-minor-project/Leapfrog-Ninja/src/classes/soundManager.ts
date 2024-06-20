@@ -19,7 +19,7 @@ export class SoundManager {
    * @param {string} src - The source file for the sound.
    * @param {boolean} loop - Whether the sound should loop.
    */
-  loadSound(key: string, src: string, loop: boolean = false): void {
+  loadSound(key: string, src: string, loop: boolean = true): void {
     const audio = new Audio(src);
     audio.loop = loop;
     this.sounds[key] = { audio, loop };

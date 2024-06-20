@@ -343,16 +343,11 @@ export class BaseEnemy implements Character {
     } else if (this.animationState == AnimationState.Dead) {
       console.log("enemy is in dead mode");
       console.log(this.animationState);
-
       if (this.animationFrameCount++ >= currentAnimationFrameRate) {
         this.animationFrameCount = 0;
         this.frameY = this.frameY + 1;
-
         if (this.frameY >= currentAnimationFrameRate) {
-          this.frameY = currentAnimationFrameRate;
         }
-        console.log("Animation current frame is ", currentAnimationFrameRate);
-        console.log("Animation frameY frame is ", this.frameY);
       }
     } else {
       if (this.animationFrameCount++ >= currentAnimationFrameRate) {

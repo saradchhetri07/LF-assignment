@@ -3,20 +3,27 @@
  */
 
 import { AttackType, Character } from "../interfaces/interface";
+import { Game } from "./game";
 
 export class InputHandler {
   private character: Character;
   private keys: Set<string>;
   private controlSchema: { [key: string]: string };
+  private game: Game;
 
   /**
    * Create a new input handler.
    * @param {Player} player - The player character.
    */
-  constructor(character: Character, controlSchema: { [key: string]: string }) {
+  constructor(
+    character: Character,
+    controlSchema: { [key: string]: string },
+    game: Game
+  ) {
     this.character = character;
     this.keys = new Set();
     this.controlSchema = controlSchema;
+    this.game = game;
 
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
     window.addEventListener("keyup", this.handleKeyUp.bind(this));
@@ -65,16 +72,16 @@ export class InputHandler {
           break;
 
         case "moveUp":
-          console.log("move up in input handler");
           this.character.move("moveUp");
           break;
         case "Attack":
-          console.log("move up in attack handler");
           this.character.move("Attack");
           break;
         case "ThrowWeapon":
-          console.log("move up in attack handler");
           this.character.move("ThrowWeapon");
+          break;
+        case "pause":
+          this.game.togglePause();
           break;
       }
     }

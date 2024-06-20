@@ -102,7 +102,6 @@ export class Level implements Drawable, Updatable {
       this.currentBackGroundIndex = this.subLevel;
     } else {
       console.log("All sub-levels completed!");
-      // Implement logic for when all sub-levels are completed
     }
   }
 

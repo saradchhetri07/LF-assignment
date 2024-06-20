@@ -9,11 +9,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
 </head>
 
 <body>
-  <canvas id="gameCanvas"></canvas>
+  <div class="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    <!-- to select the male or female character -->
+    <div class="characterSelector">
+      <div class="maleCharacter" id="maleCharacterID">
+        <img src="./images/gameplay/maleCharacter.png" alt="male-character">
+      </div>
+      <div class="femaleCharacter" id="femaleCharacterID">
+        <img src="./images/gameplay/femaleCharacter.png" alt="female-character">
+      </div>
+
+    </div>
+    <!-- buttons required for the game -->
+    <button class="playGame" id="playGameID">PLAY GAME</button>
+    <button class="chooseCharacter" id="chooseCharacterID">CHOOSE PLAYER</button>
+    <button class="viewEnemies" id="viewEnemiesID">VIEW ALL ENEMIES</button>
+    <button class="ok" id="okID">OK</button>
+    <button class="gameInstruction" id="gameInstructionID">Ok! I GOT IT!</button>
+    <button class="levelCompleted" id="levelCompletedID">Go To Next Level</button>
+    <button class="playAgain" id="playAgainID">TRY AGAIN</button>
+  </div>
+
   <script type="module" src="/src/main.ts"></script>
+
 </body>
 
 </html>

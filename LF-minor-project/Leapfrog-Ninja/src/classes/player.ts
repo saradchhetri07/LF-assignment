@@ -12,8 +12,10 @@ import kunaiImage from "../assets/Images/player/kunaiDown.png";
 
 import {
   CANVAS_DIMENSIONS,
+  KUNAI_CONSTANT,
   NINJA_SPRITE_RUNNING,
 } from "../constants/constants";
+import { Kunai } from "./kunai";
 
 enum AnimationState {
   Idle,
@@ -56,10 +58,11 @@ export class Player implements Character {
   gravity: number;
   isAttacking: boolean;
   playerHead: HTMLImageElement;
-  kunaiImage: HTMLImageElement; // Add this property
+  kunaiImage: HTMLImageElement;
+  kunaiWeapon: Kunai[] = [];
 
   isTurningLeft: boolean = false;
-  isTurningRight: boolean = false;
+  isTurningRight: boolean = true;
 
   private initialY: number;
   private jumpHeight: number;
@@ -78,14 +81,15 @@ export class Player implements Character {
     this.size = size;
     this.playerHead = new Image();
     this.playerHead.src = playerHeadImage;
-    this.kunaiImage = new Image();
-    this.kunaiImage.src = kunaiImage;
 
     this.health = health;
     this.maxHealth = 100;
 
     this.image = new Image();
     this.image.src = imageSrc;
+    this.kunaiImage = new Image();
+    this.kunaiImage.src = kunaiImage;
+    //kunai weapon declare
 
     this.frameX = 0;
     this.frameY = 0;
@@ -107,7 +111,6 @@ export class Player implements Character {
     this.gravity = 9.8;
 
     this.verticalFrameTimer = null; // Initialize vertical frame timer
-
     this.animationSettings = {
       [AnimationState.Idle]: {
         image: playerIdleImage,
@@ -180,7 +183,6 @@ export class Player implements Character {
       case "idle":
         this.animationState = AnimationState.Idle;
         this.isJumping = false;
-        console.log(this.animationState);
         break;
 
       case "moveLeft":
@@ -190,7 +192,6 @@ export class Player implements Character {
         this.velocity.x = -8;
         this.frameX = 1;
         this.animationState = AnimationState.Run;
-        console.log(this.animationState);
         break;
 
       case "moveRight":
@@ -315,7 +316,6 @@ export class Player implements Character {
 
     if (this.animationState == AnimationState.ThrowWeapon) {
       this.image.src = playerThrowImage;
-      this.position.y += this.velocity.y;
     }
 
     if (this.animationState == AnimationState.Dead) {
@@ -367,7 +367,5 @@ export class Player implements Character {
     }
   }
 
-  handleCollision(): void {
-    console.log("Handling collision!");
-  }
+  handleCollision(): void {}
 }

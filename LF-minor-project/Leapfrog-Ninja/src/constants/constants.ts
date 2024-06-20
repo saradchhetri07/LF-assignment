@@ -68,3 +68,8 @@ export const LEVEL1_ENEMY = {
   WIDTH: 262,
   MAX_FRAME: 10,
 };
+
+export const KUNAI_CONSTANT = {
+  width: 80,
+  height: 80,
+};

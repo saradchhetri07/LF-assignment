@@ -1,6 +1,7 @@
 import "./style.css";
 import { Game } from "./classes/game";
 import { CANVAS_DIMENSIONS } from "./constants/constants";
+import { loadAssets } from "./utils/audioLoad";
 
 window.addEventListener("load", () => {
   const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
@@ -16,7 +17,14 @@ window.addEventListener("load", () => {
     console.error("No 2D context found!");
     return;
   }
-
-  const game = new Game(canvas, ctx);
-  game.start();
+  // Load assets before starting the game
+  loadAssets()
+    .then((assets) => {
+      const game = new Game(canvas, ctx, assets);
+      game.start();
+      // Add event listener for space bar to pause/resume the game
+    })
+    .catch((error) => {
+      console.error("Error loading assets:", error);
+    });
 });

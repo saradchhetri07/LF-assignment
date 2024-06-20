@@ -1,5 +1,5 @@
 import { Player } from "../classes/player";
-import kunaiImage from "../assets/Images/player/kunai.png";
+import kunaiImage from "../assets/Images/player/kunaiIcon.png";
 
 interface Drawable {
   display(context: CanvasRenderingContext2D): void;
@@ -19,18 +19,22 @@ interface Size {
   height: number;
 }
 
-class Kunai implements Drawable, Pickable {
+export class Kunai implements Drawable, Pickable {
   position: Position;
   size: Size;
   count: number;
   image: HTMLImageElement;
+  damageLevel: number = 4;
+  isRightDirection: boolean;
+  velocity: { x: number; y: number } = { x: 8, y: 0 };
 
-  constructor(x: number, y: number, count: number) {
+  constructor(x: number, y: number, count: number, isRightDirection: boolean) {
     this.position = { x, y };
-    this.size = { width: 50, height: 5 };
+    this.size = { width: 50, height: 20 };
     this.count = count;
     this.image = new Image();
     this.image.src = kunaiImage;
+    this.isRightDirection = isRightDirection;
   }
 
   increaseCount(): void {
@@ -40,15 +44,19 @@ class Kunai implements Drawable, Pickable {
   display(context: CanvasRenderingContext2D): void {
     context.drawImage(
       this.image,
-      0,
-      0,
-      60,
-      15,
       this.position.x,
-      this.position.y - 30,
-      50,
-      15
+      this.position.y,
+      this.size.width,
+      this.size.height
     );
+  }
+
+  update(deltaTime: number, isRight: boolean) {
+    if (this.isRightDirection) {
+      this.position.x += (this.velocity.x * deltaTime) / 16.67;
+    } else {
+      this.position.x -= (this.velocity.x * deltaTime) / 16.67;
+    }
   }
 
   isPickedUp(player: Player): boolean {
