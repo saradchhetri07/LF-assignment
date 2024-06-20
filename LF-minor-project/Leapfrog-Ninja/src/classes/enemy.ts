@@ -4,12 +4,8 @@ import Level_1_Sublevel_1_Enemy_Attack from "../assets/Images/enemy/enemyAttacki
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 
 /**
- * Base class representing an enemy.
+ * Enum representing the different animation states.
  */
-/**
- * Base class representing an enemy.
- */
-
 enum AnimationState {
   Idle,
   Run,
@@ -19,6 +15,9 @@ enum AnimationState {
   moveUp,
 }
 
+/**
+ * Interface representing the settings for animations.
+ */
 interface AnimationSettings {
   maxFrame: number;
   frameWidth: number;
@@ -28,6 +27,9 @@ interface AnimationSettings {
   animationFrameRate: number;
 }
 
+/**
+ * Class representing a base enemy.
+ */
 export class BaseEnemy implements Character {
   position: Position;
   damageLevel: number;
@@ -55,9 +57,20 @@ export class BaseEnemy implements Character {
   enemyHead: HTMLImageElement;
 
   private verticalFrameTimer: number | null;
-
   private animationSettings: { [key in AnimationState]: AnimationSettings };
 
+  /**
+   * Create a new enemy.
+   * @param {Position} position - The initial position of the enemy.
+   * @param {Size} size - The size of the enemy.
+   * @param {number} health - The initial health of the enemy.
+   * @param {number} power - The power level of the enemy.
+   * @param {number} damageLevel - The damage level of the enemy.
+   * @param {string} type - The type of the enemy.
+   * @param {string} imageSrc - The source path for the enemy image.
+   * @param {string} imageHeadSrc - The source path for the enemy head image.
+   * @param {Object} velocity - The initial velocity of the enemy.
+   */
   constructor(
     position: Position,
     size: Size,
@@ -74,9 +87,9 @@ export class BaseEnemy implements Character {
     this.initialY = position.y;
     this.velocity = velocity;
     this.enemyHead = new Image();
-    (this.enemyHead.src = imageHeadSrc), (this.health = health);
+    this.enemyHead.src = imageHeadSrc;
+    this.health = health;
     this.maxHealth = 10;
-
     this.power = power;
     this.damageLevel = damageLevel;
     this.type = type;
@@ -94,7 +107,7 @@ export class BaseEnemy implements Character {
 
     this.frameX = 0;
     this.frameY = 0;
-    this.maxFrame = 10; // Assume there are 4 frames (0 to 3) in the sprite sheet
+    this.maxFrame = 10; // Assume there are 10 frames in the sprite sheet
 
     this.animationSettings = {
       [AnimationState.Idle]: {
@@ -103,7 +116,7 @@ export class BaseEnemy implements Character {
         frameHeight: 1400 / 10,
         columns: 2,
         rows: 10,
-        animationFrameRate: 10, // Add this line
+        animationFrameRate: 10,
       },
       [AnimationState.Run]: {
         maxFrame: 10,
@@ -113,7 +126,6 @@ export class BaseEnemy implements Character {
         rows: 10,
         animationFrameRate: 10,
       },
-
       [AnimationState.Attack]: {
         maxFrame: 10,
         frameWidth: size.width,
@@ -127,14 +139,6 @@ export class BaseEnemy implements Character {
         frameWidth: size.width,
         frameHeight: size.height,
         columns: 2,
-        rows: 10,
-        animationFrameRate: 10,
-      },
-      [AnimationState.Poke]: {
-        maxFrame: 10,
-        frameWidth: size.width,
-        frameHeight: size.height,
-        columns: 1,
         rows: 10,
         animationFrameRate: 10,
       },
@@ -157,79 +161,130 @@ export class BaseEnemy implements Character {
     };
   }
 
+  /**
+   * Move the enemy in the specified direction.
+   * @param {string} direction - The direction to move the enemy.
+   */
   move(direction: string): void {
     switch (direction) {
       case "idle":
-        this.animationState = AnimationState.Idle;
-        this.isJumping = false;
+        this.setIdleState();
         break;
-
       case "moveLeft":
-        if (this.isJumping) break;
-        this.isTurningLeft = true;
-        this.isTurningRight = false;
-        this.velocity.x = -8;
-        this.frameX = 1;
-        this.animationState = AnimationState.Run;
+        this.moveLeft();
         break;
-
       case "moveRight":
-        this.isTurningLeft = false;
-        this.isTurningRight = true;
-        this.velocity.x = 8;
-        this.frameX = 0;
-        this.animationState = AnimationState.Run;
-        console.log(this.position);
+        this.moveRight();
         break;
-
       case "moveUp":
-        if (!this.isJumping) {
-          this.velocity.y = -10;
-          this.isJumping = true;
-          this.animationState = AnimationState.moveUp;
-        }
+        this.jump();
         break;
-
       case "Attack":
-        this.animationState = AnimationState.Attack;
+        this.attack();
         break;
-
       case "ThrowWeapon":
-        this.animationState = AnimationState.ThrowWeapon;
+        this.throwWeapon();
         break;
-
       default:
-        console.log("key up");
+        console.log("Invalid direction");
         break;
     }
+  }
+
+  /**
+   * Set the enemy to the idle state.
+   */
+  private setIdleState(): void {
+    this.animationState = AnimationState.Idle;
+    this.isJumping = false;
     this.updateAnimation();
   }
 
-  handleCollision(): void {
-    // Handle collisions with other objects
+  /**
+   * Move the enemy to the left.
+   */
+  private moveLeft(): void {
+    if (this.isJumping) return;
+    this.isTurningLeft = true;
+    this.isTurningRight = false;
+    this.velocity.x = -8;
+    this.frameX = 1;
+    this.animationState = AnimationState.Run;
+    this.updateAnimation();
   }
 
+  /**
+   * Move the enemy to the right.
+   */
+  private moveRight(): void {
+    this.isTurningLeft = false;
+    this.isTurningRight = true;
+    this.velocity.x = 8;
+    this.frameX = 0;
+    this.animationState = AnimationState.Run;
+    this.updateAnimation();
+  }
+
+  /**
+   * Make the enemy jump.
+   */
+  private jump(): void {
+    if (!this.isJumping) {
+      this.velocity.y = -10;
+      this.isJumping = true;
+      this.animationState = AnimationState.moveUp;
+      this.updateAnimation();
+    }
+  }
+
+  /**
+   * Make the enemy attack.
+   */
+  private attack(): void {
+    this.animationState = AnimationState.Attack;
+    this.isAttacking = true;
+    this.updateAnimation();
+  }
+
+  /**
+   * Make the enemy throw a weapon.
+   */
+  private throwWeapon(): void {
+    this.animationState = AnimationState.ThrowWeapon;
+    this.isAttacking = true;
+    this.updateAnimation();
+  }
+
+  /**
+   * Handle collisions with other objects.
+   */
+  handleCollision(): void {
+    // Implement collision handling logic here
+  }
+
+  /**
+   * Draw the enemy on the canvas.
+   * @param {CanvasRenderingContext2D} context - The drawing context.
+   */
   draw(context: CanvasRenderingContext2D): void {
     const { frameWidth, frameHeight } =
       this.animationSettings[this.animationState];
 
-    // Draw the player's image
+    // Draw the enemy's image
     context.drawImage(
       this.image,
       this.frameX * frameWidth,
       this.frameY * frameHeight,
-      frameWidth, // Use frameWidth for the source width
-      frameHeight, // Use frameHeight for the source height
+      frameWidth,
+      frameHeight,
       this.position.x,
       this.position.y,
       this.size.width,
       this.size.height
     );
 
-    // Set the stroke style to red
+    // Draw the rectangle around the enemy's image
     context.strokeStyle = "red";
-
-    // Draw the rectangle around the player's image
     context.strokeRect(
       this.position.x,
       this.position.y,
@@ -238,7 +293,10 @@ export class BaseEnemy implements Character {
     );
   }
 
-  //function to decrease the player health when hit by opponent
+  /**
+   * Decrease the enemy's health when hit by an opponent.
+   * @param {number} damage - The amount of damage to inflict.
+   */
   decreaseHealth(damage: number): void {
     this.health -= damage;
     if (this.health <= 0) {
@@ -250,27 +308,26 @@ export class BaseEnemy implements Character {
     }
   }
 
+  /**
+   * Update the enemy's state.
+   * @param {number} deltaTime - The time elapsed since the last update.
+   */
   update(deltaTime: number): void {
+    this.updatePosition(deltaTime);
+    this.handleBoundaryCollisions();
+    this.updateAnimation();
+  }
+
+  /**
+   * Update the enemy's position based on its velocity.
+   * @param {number} deltaTime - The time elapsed since the last update.
+   */
+  private updatePosition(deltaTime: number): void {
     if (this.isJumping) {
       this.position.y += (this.velocity.y * deltaTime) / 16.67;
       if (this.position.y <= this.initialY - this.jumpHeight) {
         this.velocity.y = this.gravity;
       }
-    }
-
-    if (this.position.x + this.size.width >= CANVAS_DIMENSIONS.CANVAS_WIDTH) {
-      console.log(
-        "collided",
-        this.position,
-        this.size,
-        CANVAS_DIMENSIONS.CANVAS_WIDTH
-      );
-
-      this.position.x = CANVAS_DIMENSIONS.CANVAS_WIDTH - this.size.width;
-    }
-
-    if (this.position.y > this.initialY) {
-      this.position.y = this.initialY;
     }
 
     if (!this.isJumping && this.position.y < this.initialY) {
@@ -285,17 +342,11 @@ export class BaseEnemy implements Character {
     if (this.animationState == AnimationState.Idle) {
       this.isAttacking = false;
       this.image.src = getEnemySprite(this.type, "Idle");
-      // this.velocity.x = 0;
-      // this.velocity.y = 0;
     }
 
     if (this.animationState == AnimationState.Attack) {
       this.isAttacking = true;
-      console.log(this.type);
       this.image.src = getEnemySprite(this.type, "Attack");
-
-      console.log("enemy came to attack");
-      // this.position.x += this.velocity.x;
     }
 
     if (this.animationState == AnimationState.moveUp) {
@@ -313,48 +364,81 @@ export class BaseEnemy implements Character {
       this.isAttacking = false;
       this.image.src = getEnemySprite(this.type, "Dead");
     }
-
-    if (this.position.x < 0) this.position.x = 0;
-
-    this.updateAnimation();
   }
 
-  updateAnimation(): void {
+  /**
+   * Handle collisions with the canvas boundaries.
+   */
+  private handleBoundaryCollisions(): void {
+    if (this.position.x + this.size.width >= CANVAS_DIMENSIONS.CANVAS_WIDTH) {
+      this.position.x = CANVAS_DIMENSIONS.CANVAS_WIDTH - this.size.width;
+    }
+
+    if (this.position.y > this.initialY) {
+      this.position.y = this.initialY;
+    }
+
+    if (this.position.x < 0) {
+      this.position.x = 0;
+    }
+  }
+
+  /**
+   * Update the enemy's animation.
+   */
+  private updateAnimation(): void {
     const { maxFrame, frameWidth, frameHeight, animationFrameRate } =
       this.animationSettings[this.animationState];
     this.maxFrame = maxFrame;
 
-    // If the animation state is Attack, use a different frame rate
     const currentAnimationFrameRate =
       this.animationState === AnimationState.Attack
         ? this.animationSettings[AnimationState.Attack].animationFrameRate
         : animationFrameRate;
 
-    // Handle vertical frame timer
     if (this.animationState == AnimationState.Attack) {
-      if (!this.verticalFrameTimer) {
-        this.verticalFrameTimer = setTimeout(() => {
-          this.frameY =
-            (this.frameY + 1) %
-            this.animationSettings[this.animationState].rows;
-          this.verticalFrameTimer = null; // Reset timer after the frame update
-        }, 1000 / currentAnimationFrameRate); // Delay for the vertical frames
-      }
+      this.handleVerticalAnimation(currentAnimationFrameRate);
     } else if (this.animationState == AnimationState.Dead) {
-      console.log("enemy is in dead mode");
-      console.log(this.animationState);
-      if (this.animationFrameCount++ >= currentAnimationFrameRate) {
-        this.animationFrameCount = 0;
-        this.frameY = this.frameY + 1;
-        if (this.frameY >= currentAnimationFrameRate) {
-        }
-      }
+      this.handleDeadAnimation(currentAnimationFrameRate);
     } else {
-      if (this.animationFrameCount++ >= currentAnimationFrameRate) {
-        this.animationFrameCount = 0;
+      this.handleRegularAnimation(currentAnimationFrameRate);
+    }
+  }
+
+  /**
+   * Handle the animation for vertical movements.
+   * @param {number} frameRate - The frame rate for the animation.
+   */
+  private handleVerticalAnimation(frameRate: number): void {
+    if (!this.verticalFrameTimer) {
+      this.verticalFrameTimer = setTimeout(() => {
         this.frameY =
           (this.frameY + 1) % this.animationSettings[this.animationState].rows;
-      }
+        this.verticalFrameTimer = null; // Reset timer after the frame update
+      }, 1000 / frameRate); // Delay for the vertical frames
+    }
+  }
+
+  /**
+   * Handle the animation for the dead state.
+   * @param {number} frameRate - The frame rate for the animation.
+   */
+  private handleDeadAnimation(frameRate: number): void {
+    if (this.animationFrameCount++ >= frameRate) {
+      this.animationFrameCount = 0;
+      this.frameY = this.frameY + 1;
+    }
+  }
+
+  /**
+   * Handle regular animations.
+   * @param {number} frameRate - The frame rate for the animation.
+   */
+  private handleRegularAnimation(frameRate: number): void {
+    if (this.animationFrameCount++ >= frameRate) {
+      this.animationFrameCount = 0;
+      this.frameY =
+        (this.frameY + 1) % this.animationSettings[this.animationState].rows;
     }
   }
 }
