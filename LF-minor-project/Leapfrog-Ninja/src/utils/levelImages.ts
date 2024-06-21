@@ -1,5 +1,6 @@
-import level1background1 from "../assets/Images/background/level1background1.jpeg";
-import level1background2 from "../assets/Images/background/platBackground-CH3.png";
+import level1background1 from "../assets/Images/background/platBackground-CH1.png";
+
+import level1background2 from "../assets/Images/background/platBackground-CH1.png";
 
 export const makeLevelImages = () => {
   const levelImages: { [key: string]: HTMLImageElement[] } = {

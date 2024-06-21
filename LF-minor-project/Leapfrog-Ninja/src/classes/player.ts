@@ -1,5 +1,10 @@
-import { Platform } from "./../../../../LF-assignment-6-Doodle-Jump/Doodle-Jump--/src/components/Platform";
-import { Character, Position, Size, AttackType } from "../interfaces/interface";
+import {
+  Character,
+  Position,
+  Size,
+  AttackType,
+  Platform,
+} from "../interfaces/interface";
 import playerIdleImage from "../assets/Images/player/ninjaBoyIdle.png";
 import playerMoveImage from "../assets/Images/player/ninjaBoyMove.png";
 import playerAttackImage from "../assets/Images/player/ninjaBoyAttack.png";
@@ -57,6 +62,7 @@ export class Player implements Character {
   isDead: boolean = false;
   gravity: number;
   isAttacking: boolean;
+  jumpingForce: number = 12;
   playerHead: HTMLImageElement;
   kunaiImage: HTMLImageElement;
   kunaiWeapon: Kunai[] = [];
@@ -65,7 +71,7 @@ export class Player implements Character {
   isTurningRight: boolean = true;
 
   private initialY: number;
-  private jumpHeight: number;
+  private jumpHeight: number = 20;
   private verticalFrameTimer: number | null; // Timer for vertical movement
 
   private animationSettings: { [key in AnimationState]: AnimationSettings };
@@ -107,7 +113,6 @@ export class Player implements Character {
 
     this.initialY = position.y;
     this.isAttacking = false;
-    this.jumpHeight = 300; // Set the desired jump height
     this.gravity = 9.8;
 
     this.verticalFrameTimer = null; // Initialize vertical frame timer
@@ -205,7 +210,7 @@ export class Player implements Character {
 
       case "moveUp":
         if (!this.isJumping) {
-          this.velocity.y = -10;
+          this.velocity.y = -this.jumpingForce;
           this.isJumping = true;
           this.animationState = AnimationState.moveUp;
         }
@@ -272,16 +277,60 @@ export class Player implements Character {
     }
   }
 
-  update(deltaTime: number): void {
+  /**
+   * Check and handle collisions with platforms.
+   * @param platforms - Array of platforms to check for collisions.
+   */
+  handlePlatformCollisions(platforms: Platform[]): void {
+    for (const platform of platforms) {
+      // console.log("platform", platform.y);
+      // console.log("position of player", this.position.y);
+      if (this.position.y + this.size.height <= platform.y) {
+        console.log("hang onto it");
+
+        this.position.y = platform.y - this.size.height;
+        this.velocity.y = 0;
+        this.isJumping = false;
+      }
+
+      // if (
+      //   this.position.x < platform.x + platform.width &&
+      //   this.position.x + this.size.width > platform.x &&
+      //   this.position.y + this.size.height <= platform.y &&
+      //   this.position.y + this.size.height + this.velocity.y >= platform.y
+      // ) {
+      //   console.log("came to handle collision");
+
+      //   // Adjust player's position to sit on top of the platform
+      //   this.position.y = platform.y - this.size.height;
+      //   this.velocity.y = 0;
+      //   this.isJumping = false;
+      // }
+    }
+  }
+
+  update(deltaTime: number, platforms: Platform[]): void {
     if (this.health <= 0) {
       this.animationState = AnimationState.Dead;
     }
-    if (this.isJumping) {
-      this.position.y += (this.velocity.y * deltaTime) / 16.67;
-      if (this.position.y <= this.initialY - this.jumpHeight) {
-        this.velocity.y = this.gravity;
-      }
-    }
+
+    // //ifplayer reaches max height
+    // if (this.position.y <= this.jumpHeight) {
+    //   console.log("reached max height");
+
+    //   this.velocity.y = -this.gravity;
+    //   this.isJumping = false;
+    // }
+
+    // if (this.isJumping) {
+    //   console.log("is jumping ");
+
+    //   this.position.y += (this.velocity.y * deltaTime) / 16.67;
+    //   if (this.position.y <= this.initialY - this.jumpHeight) {
+    //     this.velocity.y = this.gravity;
+    //   }
+    // }
+
     //detect right wall collision
     if (this.position.x + this.size.width >= CANVAS_DIMENSIONS.CANVAS_WIDTH) {
       this.position.x = CANVAS_DIMENSIONS.CANVAS_WIDTH - this.size.width;
@@ -290,8 +339,9 @@ export class Player implements Character {
     if (this.position.y > this.initialY) {
       this.position.y = this.initialY;
     }
+
     if (!this.isJumping && this.position.y < this.initialY) {
-      this.position.y += this.gravity;
+      this.position.y += (this.gravity * deltaTime) / 16.67;
     }
 
     if (this.animationState == AnimationState.Run) {
@@ -302,6 +352,7 @@ export class Player implements Character {
     if (this.animationState == AnimationState.Idle) {
       this.image.src = playerIdleImage;
       this.isAttacking = false;
+      this.isJumping = false;
     }
 
     if (this.animationState == AnimationState.Attack) {
@@ -309,7 +360,7 @@ export class Player implements Character {
       this.image.src = playerAttackImage;
     }
 
-    if (this.animationState == AnimationState.moveUp) {
+    if (this.animationState == AnimationState.moveUp && this.isJumping) {
       this.image.src = playerJumpImage;
       this.position.y += (this.velocity.y * deltaTime) / 16.67;
     }
@@ -322,8 +373,10 @@ export class Player implements Character {
       this.image.src = playerDeadImage;
       this.isDead = true;
     }
-
     if (this.position.x < 0) this.position.x = 0;
+
+    // Handle platform collisions
+    this.handlePlatformCollisions(platforms);
 
     this.updateAnimation();
   }

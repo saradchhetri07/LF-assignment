@@ -40,6 +40,10 @@ export enum gameState {
   isPaused,
 }
 
+export interface Platform extends Position, Size {
+  level: number;
+}
+
 export interface Character extends Drawable, Movable, Collidable {
   position: Position;
   damageLevel: number;

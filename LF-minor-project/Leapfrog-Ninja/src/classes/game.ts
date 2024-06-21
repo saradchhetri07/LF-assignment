@@ -1,5 +1,4 @@
 import { Kunai } from "./kunai";
-import { Position, gameState } from "./../interfaces/interface";
 import {
   CANVAS_DIMENSIONS,
   NINJA_CONSTANT,
@@ -10,12 +9,13 @@ import { BaseEnemy } from "./enemy";
 import { HUD } from "./hud";
 import { InputHandler } from "./inputHandler";
 import { LevelManager } from "./levelManager";
-import { Drawable, Updatable } from "../interfaces/interface";
+
 import playerRunImage from "../assets/Images/player/ninjaBoyRunning.png";
 import { checkCollisions } from "../utils/collisionDetection";
 import { AnimationState } from "../enums/animationStateEnum";
 import { Assets } from "../utils/audioLoad";
 import { drawPauseScreen } from "../utils/pauseScreen";
+import { Drawable, Platform } from "../interfaces/interface";
 
 /**
  * Class representing the main game.
@@ -23,7 +23,6 @@ import { drawPauseScreen } from "../utils/pauseScreen";
 export class Game implements Drawable {
   private player: Player;
   private enemy: BaseEnemy; // Assuming one enemy
-  gameState = gameState.isActive;
   private hud: HUD;
   private inputHandler1: InputHandler;
   private inputHandler2: InputHandler;
@@ -37,6 +36,19 @@ export class Game implements Drawable {
   private hasKunaiLeft: boolean = false;
   private assets: Assets;
   private animationFrameId: number | null;
+
+  private ninjaPlatforms: Platform[] = [
+    { x: 130, y: 226, width: 153, height: 12, level: 1 },
+    { x: 450, y: 245, width: 75, height: 12, level: 1 },
+    { x: 160, y: 275, width: 173, height: 12, level: 2 },
+    { x: 470, y: 140, width: 128, height: 12, level: 2 },
+    { x: 160, y: 275, width: 173, height: 12, level: 3 },
+    { x: 470, y: 140, width: 128, height: 12, level: 3 },
+    { x: 33, y: 197, width: 85, height: 20, level: 4 },
+    { x: 530, y: 208, width: 140, height: 20, level: 4 },
+    { x: 85, y: 162, width: 230, height: 25, level: 5 },
+    { x: 430, y: 238, width: 230, height: 25, level: 5 },
+  ];
 
   /**
    * Create a new game.
@@ -77,7 +89,6 @@ export class Game implements Drawable {
     );
 
     this.enemy = currentLevel.getCurrentEnemy();
-    console.log(`enemy is ${this.enemy}`);
 
     this.hud = new HUD(this.player, this.enemy);
 
@@ -113,9 +124,7 @@ export class Game implements Drawable {
    * Start the game loop.
    */
   start(): void {
-    if (this.gameState == gameState.isActive) {
-      this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
-    }
+    this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
   }
 
   /**
@@ -182,7 +191,7 @@ export class Game implements Drawable {
    */
   update(deltaTime: number): void {
     this.player.draw(this.context);
-    this.player.update(deltaTime);
+    this.player.update(deltaTime, this.ninjaPlatforms);
 
     if (!this.enemy.isDead) {
       this.enemy.draw(this.context);

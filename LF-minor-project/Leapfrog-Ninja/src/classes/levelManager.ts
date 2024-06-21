@@ -11,6 +11,7 @@ import {
   Level4Enemy1,
   Level4Enemy2,
 } from "./levelEnemy";
+
 import { BaseEnemy } from "./enemy";
 import { makeLevelImages } from "../utils/levelImages";
 import { Item } from "./item";
@@ -38,6 +39,7 @@ export class LevelManager {
 
   makeLevelAttributes(): Level[] {
     const localLevels: Level[] = [];
+
     for (let level = 1; level <= 4; level++) {
       const levelKey = `level${level}`;
       const newLevel = new Level(
