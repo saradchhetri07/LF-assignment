@@ -18,6 +18,7 @@ import kunaiImage from "../assets/Images/player/kunaiDown.png";
 import {
   CANVAS_DIMENSIONS,
   KUNAI_CONSTANT,
+  NINJA_CONSTANT,
   NINJA_SPRITE_RUNNING,
 } from "../constants/constants";
 import { Kunai } from "./kunai";
@@ -59,6 +60,7 @@ export class Player implements Character {
   animationState: AnimationState;
   animationFrameRate: number;
   animationFrameCount: number;
+  level: number;
   isDead: boolean = false;
   gravity: number;
   isAttacking: boolean;
@@ -71,7 +73,7 @@ export class Player implements Character {
   isTurningRight: boolean = true;
 
   private initialY: number;
-  private jumpHeight: number = 20;
+  private jumpHeight: number = 100;
   private verticalFrameTimer: number | null; // Timer for vertical movement
 
   private animationSettings: { [key in AnimationState]: AnimationSettings };
@@ -81,12 +83,14 @@ export class Player implements Character {
     size: Size,
     imageSrc: string,
     maxFrame: number,
-    health: number
+    health: number,
+    level: number
   ) {
     this.position = position;
     this.size = size;
     this.playerHead = new Image();
     this.playerHead.src = playerHeadImage;
+    this.level = level;
 
     this.health = health;
     this.maxHealth = 100;
@@ -191,7 +195,7 @@ export class Player implements Character {
         break;
 
       case "moveLeft":
-        if (this.isJumping) break;
+        // if (this.isJumping) break;
         this.isTurningLeft = true;
         this.isTurningRight = false;
         this.velocity.x = -8;
@@ -200,7 +204,7 @@ export class Player implements Character {
         break;
 
       case "moveRight":
-        if (this.isJumping) break;
+        // if (this.isJumping) break;
         this.isTurningLeft = false;
         this.isTurningRight = true;
         this.velocity.x = 8;
@@ -245,8 +249,8 @@ export class Player implements Character {
       frameHeight, // Use frameHeight for the source height
       this.position.x,
       this.position.y,
-      this.size.width / 1.2,
-      this.size.height / 1.3
+      this.size.width,
+      this.size.height
     );
 
     // Set the stroke style to red
@@ -283,16 +287,35 @@ export class Player implements Character {
    */
   handlePlatformCollisions(platforms: Platform[]): void {
     for (const platform of platforms) {
-      // console.log("platform", platform.y);
-      // console.log("position of player", this.position.y);
-      if (this.position.y + this.size.height <= platform.y) {
-        console.log("hang onto it");
+      // a.position.x < b.position.x + b.size.width && // a's left edge is to the left of b's right edge
+      // a.position.x + a.size.width > b.position.x && // a's right edge is to the right of b's left edge
+      // a.position.y < b.position.y + b.size.height && // a's top edge is above b's bottom edge
+      // a.position.y + a.size.height > b.position.y && // a's bottom edge is below b's top edge
+      // a.position.y + a.size.height < b.position.y + b.size.height // a's bottom edge is above b's bottom edge
 
+      if (
+        platform.level == this.level &&
+        this.position.x < platform.x + platform.width &&
+        this.position.x + this.size.width > platform.x &&
+        this.position.y < this.position.y + platform.height &&
+        this.position.y + this.size.height > platform.y &&
+        this.position.y + this.size.height < platform.y + platform.height
+      ) {
         this.position.y = platform.y - this.size.height;
         this.velocity.y = 0;
         this.isJumping = false;
       }
 
+      // if (
+      //   this.position.y + this.size.height / 1.2 <= platform.y &&
+      //   this.position.x >= platform.x &&
+      //   this.position.x + this.size.width / 1.2 <= platform.x + platform.width
+      // ) {
+      //   console.log("hang onto it");
+      //   this.position.y = platform.y - this.size.height;
+      //   this.velocity.y = 0;
+      //   // this.isJumping = false;
+      // }
       // if (
       //   this.position.x < platform.x + platform.width &&
       //   this.position.x + this.size.width > platform.x &&
@@ -300,7 +323,6 @@ export class Player implements Character {
       //   this.position.y + this.size.height + this.velocity.y >= platform.y
       // ) {
       //   console.log("came to handle collision");
-
       //   // Adjust player's position to sit on top of the platform
       //   this.position.y = platform.y - this.size.height;
       //   this.velocity.y = 0;
@@ -309,18 +331,22 @@ export class Player implements Character {
     }
   }
 
+  //increase level as player moves to next level
+  increaseLevel(): void {
+    this.level++;
+  }
   update(deltaTime: number, platforms: Platform[]): void {
     if (this.health <= 0) {
       this.animationState = AnimationState.Dead;
     }
 
     // //ifplayer reaches max height
-    // if (this.position.y <= this.jumpHeight) {
-    //   console.log("reached max height");
+    if (this.position.y <= this.jumpHeight) {
+      console.log("reached max height");
 
-    //   this.velocity.y = -this.gravity;
-    //   this.isJumping = false;
-    // }
+      this.velocity.y = -this.gravity;
+      this.isJumping = false;
+    }
 
     // if (this.isJumping) {
     //   console.log("is jumping ");
@@ -418,6 +444,19 @@ export class Player implements Character {
           (this.frameY + 1) % this.animationSettings[this.animationState].rows;
       }
     }
+  }
+
+  // In Player class
+  reset(): void {
+    this.position = {
+      x: NINJA_CONSTANT.HORIZONTAL_OFFSET,
+      y:
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT -
+        NINJA_CONSTANT.PLAYER_HEIGHT -
+        NINJA_CONSTANT.VERTICAL_OFFSET,
+    };
+    this.health = 100; // Reset health or other properties
+    this.kunaiCount = this.kunaiCount; // Reset kunai count
   }
 
   handleCollision(): void {}

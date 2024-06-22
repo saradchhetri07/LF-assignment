@@ -7,11 +7,12 @@ import { Obstacle } from "./obstacle";
  * Class representing a game level.
  */
 export class Level implements Drawable, Updatable {
-  number: number;
-  subLevel: number;
+  number: number = 1;
+  subLevel: number = 0;
   backgroundImages: HTMLImageElement[];
   currentBackGroundIndex: number = 0;
   enemies: BaseEnemy[];
+  kunaisCountOnPlatform: number = 4;
 
   // items: Item[];
   // obstacles: Obstacle[];
@@ -36,8 +37,6 @@ export class Level implements Drawable, Updatable {
     this.backgroundImages = backgroundImages;
     this.enemies = enemies;
     // this.items = items;
-    this.subLevel = 0;
-    this.currentBackGroundIndex = 0; // Initialize to the first background image
     // this.obstacles = obstacles;
   }
 
@@ -46,13 +45,20 @@ export class Level implements Drawable, Updatable {
    * @returns {BaseEnemy} The enemy for the current sub-level.
    */
   getCurrentEnemy(): BaseEnemy {
+    console.log("current level enemy is", this.enemies);
+
     return this.enemies[this.subLevel];
   }
 
-  /**
-   * Draw the level on the canvas.
-   * @param {CanvasRenderingContext2D} context - The drawing context.
-   */
+  //get current level
+  getCurrentLevel(): number {
+    return this.number;
+  }
+
+  //get kunais number to place onto the platform
+  getKunaiOnPlatformNumber(): number {
+    return this.kunaisCountOnPlatform;
+  }
 
   /**
    * Draw the level on the canvas.

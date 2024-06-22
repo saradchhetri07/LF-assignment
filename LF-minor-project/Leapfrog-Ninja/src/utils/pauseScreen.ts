@@ -24,19 +24,13 @@ export function drawPauseScreen(
   context.fillText(`NINJA HEALTH: ${health}`, canvas.width / 2, 200);
   context.fillText(`KUNAIS LEFT: ${kunaiCount}`, canvas.width / 2, 250);
   context.fillText("SCROLLS REMAINING:", canvas.width / 2, 300);
+  context.fillText("Press P to resume:", canvas.width / 2, 350);
 
   const ninjaImage = new Image();
   ninjaImage.src = "../assets/ninja.png"; // Update the path if necessary
   ninjaImage.onload = () => {
     context.drawImage(ninjaImage, canvas.width / 2 - 50, 350, 100, 100);
   };
-
-  const resumeButton = document.getElementById(
-    "resumeButton"
-  ) as HTMLButtonElement;
-  if (resumeButton) {
-    resumeButton.style.display = "block";
-  }
 
   context.restore();
 }

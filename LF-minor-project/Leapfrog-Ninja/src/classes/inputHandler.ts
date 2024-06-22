@@ -8,12 +8,15 @@ import { Game } from "./game";
 export class InputHandler {
   private character: Character;
   private keys: Set<string>;
+  private keyStates: Map<string, boolean>;
   private controlSchema: { [key: string]: string };
   private game: Game;
 
   /**
    * Create a new input handler.
-   * @param {Player} player - The player character.
+   * @param {Character} character - The character to control.
+   * @param {Object} controlSchema - The mapping of keys to actions.
+   * @param {Game} game - The game instance.
    */
   constructor(
     character: Character,
@@ -22,6 +25,7 @@ export class InputHandler {
   ) {
     this.character = character;
     this.keys = new Set();
+    this.keyStates = new Map();
     this.controlSchema = controlSchema;
     this.game = game;
 
@@ -34,10 +38,12 @@ export class InputHandler {
    * Handle key down events.
    * @param {KeyboardEvent} event - The keyboard event.
    */
-
   private handleKeyDown(event: KeyboardEvent): void {
-    this.keys.add(event.key);
-    this.processInput();
+    if (!this.keyStates.get(event.key)) {
+      this.keys.add(event.key);
+      this.keyStates.set(event.key, true);
+      this.processInput();
+    }
   }
 
   /**
@@ -46,6 +52,7 @@ export class InputHandler {
    */
   private handleKeyUp(event: KeyboardEvent): void {
     this.keys.delete(event.key);
+    this.keyStates.set(event.key, false);
     this.processInput();
   }
 
@@ -56,30 +63,37 @@ export class InputHandler {
   private handleMouseClick(event: MouseEvent): void {
     // Handle mouse click events
   }
+
   /**
-    Process the current input state.
-    */
+   * Process the current input state.
+   */
   private processInput(): void {
     let isMoving = false;
     for (let key of this.keys) {
       switch (this.controlSchema[key]) {
         case "moveLeft":
           this.character.move("moveLeft");
+          isMoving = true;
           break;
 
         case "moveRight":
           this.character.move("moveRight");
+          isMoving = true;
           break;
 
         case "moveUp":
           this.character.move("moveUp");
+          isMoving = true;
           break;
+
         case "Attack":
           this.character.move("Attack");
           break;
+
         case "ThrowWeapon":
           this.character.move("ThrowWeapon");
           break;
+
         case "pause":
           this.game.togglePause();
           break;

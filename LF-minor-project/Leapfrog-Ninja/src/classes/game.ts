@@ -4,6 +4,7 @@ import {
   NINJA_CONSTANT,
   NINJA_SPRITE_IDLE,
 } from "./../constants/constants";
+import ninjaMaleCharacter from "../assets/Images/gameplay/maleCharacter.png";
 import { Player } from "./player";
 import { BaseEnemy } from "./enemy";
 import { HUD } from "./hud";
@@ -16,6 +17,8 @@ import { AnimationState } from "../enums/animationStateEnum";
 import { Assets } from "../utils/audioLoad";
 import { drawPauseScreen } from "../utils/pauseScreen";
 import { Drawable, Platform } from "../interfaces/interface";
+import { levelCompleted } from "../utils/levelCompleted";
+import { Scroll } from "./scroll";
 
 /**
  * Class representing the main game.
@@ -32,22 +35,45 @@ export class Game implements Drawable {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   isPaused: boolean = false; // Initialize isPaused to false
+
   private kunai: Kunai[] = [];
+  private kunaiClass?: Kunai;
+
   private hasKunaiLeft: boolean = false;
   private assets: Assets;
   private animationFrameId: number | null;
 
+  private scroll: Scroll = new Scroll(520, 320);
+
   private ninjaPlatforms: Platform[] = [
-    { x: 130, y: 226, width: 153, height: 12, level: 1 },
-    { x: 450, y: 245, width: 75, height: 12, level: 1 },
-    { x: 160, y: 275, width: 173, height: 12, level: 2 },
-    { x: 470, y: 140, width: 128, height: 12, level: 2 },
-    { x: 160, y: 275, width: 173, height: 12, level: 3 },
-    { x: 470, y: 140, width: 128, height: 12, level: 3 },
-    { x: 33, y: 197, width: 85, height: 20, level: 4 },
-    { x: 530, y: 208, width: 140, height: 20, level: 4 },
-    { x: 85, y: 162, width: 230, height: 25, level: 5 },
-    { x: 430, y: 238, width: 230, height: 25, level: 5 },
+    // this.context.strokeRect(520, 320, 75, 12);
+    { x: 150, y: 300, width: 160, height: 12, level: 1, forPlacingKunai: true },
+    { x: 520, y: 320, width: 75, height: 12, level: 1, forPlacingKunai: false },
+
+    {
+      x: 190,
+      y: 368,
+      width: 150,
+      height: 18,
+      level: 2,
+      forPlacingKunai: false,
+    },
+    { x: 470, y: 140, width: 128, height: 12, level: 2, forPlacingKunai: true },
+
+    {
+      x: 160,
+      y: 275,
+      width: 173,
+      height: 12,
+      level: 2,
+      forPlacingKunai: false,
+    },
+
+    // { x: 470, y: 140, width: 128, height: 12, level: 3, forPlacingKunai: true },
+    // { x: 33, y: 197, width: 85, height: 20, level: 4, forPlacingKunai: false },
+    // { x: 530, y: 208, width: 140, height: 20, level: 4, forPlacingKunai: true },
+    // { x: 85, y: 162, width: 230, height: 25, level: 5, forPlacingKunai: false },
+    // { x: 430, y: 238, width: 230, height: 25, level: 5, forPlacingKunai: true },
   ];
 
   /**
@@ -85,7 +111,8 @@ export class Game implements Drawable {
       },
       playerRunImage,
       NINJA_SPRITE_IDLE.MAX_FRAME,
-      100
+      100,
+      currentLevel.getCurrentLevel()
     );
 
     this.enemy = currentLevel.getCurrentEnemy();
@@ -116,8 +143,74 @@ export class Game implements Drawable {
       },
       this
     );
-
+    this.makeKunaiOnPlatform();
     this.lastTime = 0;
+  }
+
+  /**
+   * Initialize the current level.
+   */
+  reInitializeLevel(): void {
+    const currentLevel = this.levelManager.loadCurrentLevel();
+
+    this.player = new Player(
+      {
+        x: NINJA_CONSTANT.HORIZONTAL_OFFSET,
+        y:
+          CANVAS_DIMENSIONS.CANVAS_HEIGHT -
+          NINJA_CONSTANT.PLAYER_HEIGHT -
+          NINJA_CONSTANT.VERTICAL_OFFSET,
+      },
+      {
+        width: NINJA_SPRITE_IDLE.WIDTH / NINJA_SPRITE_IDLE.COLUMN,
+        height: NINJA_SPRITE_IDLE.HEIGHT / NINJA_SPRITE_IDLE.ROWS,
+      },
+      playerRunImage,
+      NINJA_SPRITE_IDLE.MAX_FRAME,
+      100,
+      currentLevel.getCurrentLevel()
+    );
+
+    console.log("level after reinitialization: ", currentLevel);
+
+    this.enemy = currentLevel.getCurrentEnemy();
+    console.log("current level number is", currentLevel.getCurrentLevel());
+
+    console.log("enemy after initialization", this.enemy);
+
+    this.hud = new HUD(this.player, this.enemy);
+
+    //clearing kunais of previous level and making it again for new level
+    this.kunaiClass?.clearkunais();
+    this.kunaiClass?.incrementKunaiLevel();
+    this.kunaiClass?.makeKunai(this.ninjaPlatforms, 3);
+    this.kunaiClass?.printKunaiStatus();
+
+    this.inputHandler1 = new InputHandler(
+      this.player,
+      {
+        ArrowLeft: "moveLeft",
+        ArrowRight: "moveRight",
+        ArrowUp: "moveUp",
+        a: "Attack",
+        s: "ThrowWeapon",
+        p: "pause",
+      },
+      this
+    );
+
+    this.inputHandler2 = new InputHandler(
+      this.enemy,
+      {
+        j: "moveLeft",
+        l: "moveRight",
+        i: "moveUp",
+        z: "Attack",
+        x: "ThrowWeapon",
+      },
+      this
+    );
+    this.makeKunaiOnPlatform();
   }
 
   /**
@@ -141,6 +234,29 @@ export class Game implements Drawable {
       this.player.health,
       this.player.kunaiCount
     );
+  }
+
+  /**
+   * Draw all the platforms with a red border.
+   */
+  private drawPlatforms(): void {
+    this.context.strokeStyle = "red";
+    this.context.lineWidth = 2;
+
+    if (this.levelManager.getCurrentLevel() == 1) {
+      this.context.strokeRect(150, 300, 160, 12);
+      this.context.strokeRect(520, 320, 75, 12);
+    }
+    if (this.levelManager.getCurrentLevel() == 2) {
+      this.context.strokeRect(190, 368, 200, 18);
+    }
+  }
+
+  private makeKunaiOnPlatform() {
+    // Instantiate kunaiClass
+    this.kunaiClass = new Kunai(0, 0, 0, false, 1);
+    console.log("makeKunaiOnPlatform");
+    this.kunaiClass?.makeKunai(this.ninjaPlatforms, 3);
   }
 
   /**
@@ -195,12 +311,20 @@ export class Game implements Drawable {
 
     if (!this.enemy.isDead) {
       this.enemy.draw(this.context);
+    } else {
+      levelCompleted(this.context, this.canvas, this.startNextLevel.bind(this));
+
+      return;
     }
     this.enemy.update(deltaTime);
+
+    this.drawPlatforms();
+    this.kunaiClass?.placeKunai(this.context);
 
     this.handleCollisions();
     this.updateKunais(deltaTime);
     this.hud.draw(this.context);
+    this.scroll.display(this.context);
   }
 
   /**
@@ -237,7 +361,8 @@ export class Game implements Drawable {
           (this.player.isTurningRight ? this.player.size.width : 0),
         this.player.position.y + this.player.size.height / 2.5,
         this.player.kunaiCount,
-        this.player.isTurningRight
+        this.player.isTurningRight,
+        this.levelManager.getCurrentLevel()
       );
       this.kunai.push(newKunai);
       this.player.kunaiCount--;
@@ -254,6 +379,7 @@ export class Game implements Drawable {
         checkCollisions(kunai, this.enemy)
       ) {
         this.hasKunaiLeft = false;
+        this.enemy.hitEffect(this.player.isTurningLeft);
         this.kunai.splice(index, 1);
         if (checkCollisions(kunai, this.enemy)) {
           this.enemy.decreaseHealth(kunai.damageLevel);
@@ -274,8 +400,34 @@ export class Game implements Drawable {
    * Draw the game state to the canvas.
    */
   draw(): void {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const currentLevel = this.levelManager.loadCurrentLevel();
     currentLevel.draw(this.context);
+  }
+
+  /**
+   * Start the next level.
+   */
+  startNextLevel(): void {
+    const button = document.getElementById("nextLevelButton");
+    if (button) {
+      button.remove();
+    }
+
+    this.context.clearRect(
+      0,
+      0,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT
+    );
+
+    this.player.reset(); // Add a reset method to reset player start
+    this.player.increaseLevel();
+
+    this.levelManager.incrementLevel();
+
+    this.levelManager.printAllLevel();
+    this.reInitializeLevel();
+
+    this.start();
   }
 }

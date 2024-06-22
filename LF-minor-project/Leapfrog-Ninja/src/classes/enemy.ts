@@ -293,6 +293,13 @@ export class BaseEnemy implements Character {
     );
   }
 
+  hitEffect(attackFromLeft: boolean): void {
+    if (attackFromLeft) {
+      this.position.x -= 4;
+    } else {
+      this.position.x += 4;
+    }
+  }
   /**
    * Decrease the enemy's health when hit by an opponent.
    * @param {number} damage - The amount of damage to inflict.

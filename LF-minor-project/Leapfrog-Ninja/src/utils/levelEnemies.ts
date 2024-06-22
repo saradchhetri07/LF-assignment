@@ -15,6 +15,8 @@ import {
 import level_1_Enemy_1_Image from "../assets/Images/enemy/enemyIdle.png";
 import enemyHeadImage from "../assets/Images/enemy/enemyIcon.png";
 
+import level_2_Enemy_1_Image from "../assets/Images/enemy/ork2Idle.png";
+import level_2_Enemy_head from "../assets/Images/enemy/orkIcon.png";
 
 export const makeLevelEnemies = [
   [
@@ -32,14 +34,16 @@ export const makeLevelEnemies = [
         height: LEVEL1_ENEMY.HEIGHT / LEVEL1_ENEMY.ROWS,
       },
       100,
-      6,
+      4,
       2,
       "level_1_sublevel_1",
       level_1_Enemy_1_Image,
       enemyHeadImage,
       { x: 8, y: 8 }
     ),
-    
+  ],
+
+  [
     new BaseEnemy(
       {
         x: CANVAS_DIMENSIONS.CANVAS_WIDTH - NINJA_CONSTANT.HORIZONTAL_OFFSET,
@@ -53,28 +57,12 @@ export const makeLevelEnemies = [
         height: LEVEL1_ENEMY.HEIGHT / LEVEL1_ENEMY.ROWS,
       },
       100,
-      6,
+      8,
       2,
-      "level_1_sublevel_1",
-      level_1_Enemy_1_Image,
-      enemyHeadImage,
-      { x: 8, y: 8 }
+      "level_2_Sublevel_1",
+      level_2_Enemy_1_Image,
+      level_2_Enemy_head,
+      { x: 4, y: 5 }
     ),
-
-  ],
-
-  [
-    new Level2Enemy1({ x: 200, y: 500 }, { width: 50, height: 50 }),
-    new Level2Enemy2({ x: 300, y: 500 }, { width: 50, height: 50 }),
-  ],
-
-  [
-    new Level3Enemy1({ x: 200, y: 500 }, { width: 50, height: 50 }),
-    new Level3Enemy2({ x: 300, y: 500 }, { width: 50, height: 50 }),
-  ],
-
-  [
-    new Level3Enemy1({ x: 200, y: 500 }, { width: 50, height: 50 }),
-    new Level3Enemy2({ x: 300, y: 500 }, { width: 50, height: 50 }),
   ],
 ];

@@ -48,10 +48,17 @@ export class LevelManager {
         this.enemies[level - 1]
       );
       localLevels.push(newLevel);
+      console.log(newLevel);
     }
     return localLevels;
   }
 
+  //print all the level for debugging
+  printAllLevel(): void {
+    this.levels.forEach((level) => {
+      console.log("level is", level);
+    });
+  }
   /**
    * Load the current level.
    * @returns {Level} - The current level.
@@ -60,12 +67,20 @@ export class LevelManager {
     return this.levels[this.currentLevel - 1];
   }
 
+  getCurrentLevel(): number {
+    return this.currentLevel;
+  }
+
   /**
    * Advance to the next sub-level.
    */
   nextSubLevel(): void {
     const currentLevel = this.loadCurrentLevel();
     currentLevel.nextSubLevel();
+  }
+
+  incrementLevel(): void {
+    this.currentLevel++;
   }
 
   /**

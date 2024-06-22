@@ -42,6 +42,7 @@ export enum gameState {
 
 export interface Platform extends Position, Size {
   level: number;
+  forPlacingKunai: boolean;
 }
 
 export interface Character extends Drawable, Movable, Collidable {
