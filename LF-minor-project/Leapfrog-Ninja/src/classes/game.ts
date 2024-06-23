@@ -19,6 +19,8 @@ import { drawPauseScreen } from "../utils/pauseScreen";
 import { Drawable, Platform } from "../interfaces/interface";
 import { levelCompleted } from "../utils/levelCompleted";
 import { Scroll } from "./scroll";
+import { Mode } from "../enums/mode";
+import { HealthPotion } from "./healthPotion";
 
 /**
  * Class representing the main game.
@@ -40,10 +42,12 @@ export class Game implements Drawable {
   private kunaiClass?: Kunai;
 
   private hasKunaiLeft: boolean = false;
-  private assets: Assets;
   private animationFrameId: number | null;
 
-  private scroll: Scroll = new Scroll(520, 320);
+  private mode: Mode; // Add mode property
+
+  private scroll?: Scroll;
+  private healthPotion?: HealthPotion;
 
   private ninjaPlatforms: Platform[] = [
     // this.context.strokeRect(520, 320, 75, 12);
@@ -56,9 +60,17 @@ export class Game implements Drawable {
       width: 150,
       height: 18,
       level: 2,
+      forPlacingKunai: true,
+    },
+
+    {
+      x: CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
+      y: CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2,
+      width: 128,
+      height: 12,
+      level: 2,
       forPlacingKunai: false,
     },
-    { x: 470, y: 140, width: 128, height: 12, level: 2, forPlacingKunai: true },
 
     {
       x: 160,
@@ -68,12 +80,6 @@ export class Game implements Drawable {
       level: 2,
       forPlacingKunai: false,
     },
-
-    // { x: 470, y: 140, width: 128, height: 12, level: 3, forPlacingKunai: true },
-    // { x: 33, y: 197, width: 85, height: 20, level: 4, forPlacingKunai: false },
-    // { x: 530, y: 208, width: 140, height: 20, level: 4, forPlacingKunai: true },
-    // { x: 85, y: 162, width: 230, height: 25, level: 5, forPlacingKunai: false },
-    // { x: 430, y: 238, width: 230, height: 25, level: 5, forPlacingKunai: true },
   ];
 
   /**
@@ -85,11 +91,11 @@ export class Game implements Drawable {
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-    assets: Assets
+    mode: Mode
   ) {
     this.canvas = canvas;
     this.context = context;
-    this.assets = assets;
+    this.mode = mode;
 
     this.levelManager = new LevelManager();
     const currentLevel = this.levelManager.loadCurrentLevel();
@@ -145,38 +151,29 @@ export class Game implements Drawable {
     );
     this.makeKunaiOnPlatform();
     this.lastTime = 0;
+    this.makeScroll();
+    this.makeHealthPotion();
+  }
+
+  private makeHealthPotion(): void {
+    const healthPotion = new HealthPotion(0, 0, 1);
+    healthPotion.makeHealthPotion(this.ninjaPlatforms);
+  }
+
+  makeScroll(): void {
+    console.log("making scroll");
+    this.scroll = new Scroll(0, 0, 1);
+    this.scroll?.makeScroll(this.ninjaPlatforms);
   }
 
   /**
+   *
    * Initialize the current level.
    */
   reInitializeLevel(): void {
     const currentLevel = this.levelManager.loadCurrentLevel();
 
-    this.player = new Player(
-      {
-        x: NINJA_CONSTANT.HORIZONTAL_OFFSET,
-        y:
-          CANVAS_DIMENSIONS.CANVAS_HEIGHT -
-          NINJA_CONSTANT.PLAYER_HEIGHT -
-          NINJA_CONSTANT.VERTICAL_OFFSET,
-      },
-      {
-        width: NINJA_SPRITE_IDLE.WIDTH / NINJA_SPRITE_IDLE.COLUMN,
-        height: NINJA_SPRITE_IDLE.HEIGHT / NINJA_SPRITE_IDLE.ROWS,
-      },
-      playerRunImage,
-      NINJA_SPRITE_IDLE.MAX_FRAME,
-      100,
-      currentLevel.getCurrentLevel()
-    );
-
-    console.log("level after reinitialization: ", currentLevel);
-
     this.enemy = currentLevel.getCurrentEnemy();
-    console.log("current level number is", currentLevel.getCurrentLevel());
-
-    console.log("enemy after initialization", this.enemy);
 
     this.hud = new HUD(this.player, this.enemy);
 
@@ -184,7 +181,11 @@ export class Game implements Drawable {
     this.kunaiClass?.clearkunais();
     this.kunaiClass?.incrementKunaiLevel();
     this.kunaiClass?.makeKunai(this.ninjaPlatforms, 3);
-    this.kunaiClass?.printKunaiStatus();
+
+    //clearing scroll of previous level and making it again for new level
+    this.scroll?.clearScroll();
+    this.scroll?.incrementScrollLevel();
+    this.scroll?.makeScroll(this.ninjaPlatforms);
 
     this.inputHandler1 = new InputHandler(
       this.player,
@@ -210,7 +211,6 @@ export class Game implements Drawable {
       },
       this
     );
-    this.makeKunaiOnPlatform();
   }
 
   /**
@@ -255,7 +255,6 @@ export class Game implements Drawable {
   private makeKunaiOnPlatform() {
     // Instantiate kunaiClass
     this.kunaiClass = new Kunai(0, 0, 0, false, 1);
-    console.log("makeKunaiOnPlatform");
     this.kunaiClass?.makeKunai(this.ninjaPlatforms, 3);
   }
 
@@ -277,8 +276,6 @@ export class Game implements Drawable {
    * Toggle the pause state of the game.
    */
   togglePause(): void {
-    console.log("came to toggle pause");
-
     if (this.isPaused) {
       this.resume();
     } else {
@@ -306,16 +303,31 @@ export class Game implements Drawable {
    * @param {number} deltaTime - The time elapsed since the last update.
    */
   update(deltaTime: number): void {
-    this.player.draw(this.context);
-    this.player.update(deltaTime, this.ninjaPlatforms);
-
     if (!this.enemy.isDead) {
       this.enemy.draw(this.context);
     } else {
-      levelCompleted(this.context, this.canvas, this.startNextLevel.bind(this));
-
-      return;
+      if (this.player.isScrollCollected) {
+        levelCompleted(
+          this.context,
+          this.canvas,
+          this.startNextLevel.bind(this)
+        );
+        return;
+      }
     }
+
+    this.kunaiIsPicked();
+
+    this.scrollIsPicked();
+
+    //bot movement
+    if (this.mode == Mode.Computer) {
+      this.enemy.automateBehavior(this.player);
+    }
+
+    this.player.draw(this.context);
+    this.player.update(deltaTime, this.ninjaPlatforms);
+
     this.enemy.update(deltaTime);
 
     this.drawPlatforms();
@@ -324,7 +336,47 @@ export class Game implements Drawable {
     this.handleCollisions();
     this.updateKunais(deltaTime);
     this.hud.draw(this.context);
-    this.scroll.display(this.context);
+
+    this.scroll?.display(this.context);
+
+    //make draw healthPotion
+    this.healthPotion?.display(this.context);
+    this.isHealthPotionPickedUp();
+  }
+
+  //check if the player is on the platform so as to collect the kunais
+  private kunaiIsPicked(): void {
+    if (this.player.isOnPlatform) {
+      //check if he is picking the kunais
+      this.kunaiClass?.kunaisOnPlatform.forEach((kunai, i) => {
+        if (checkCollisions(this.player, kunai)) {
+          this.player.kunaiCount++;
+          this.kunaiClass?.kunaisOnPlatform.splice(i, 1);
+        }
+      });
+    }
+  }
+
+  private isHealthPotionPickedUp(): void {
+    this.healthPotion?.healthPotions.forEach((healthPotion, i) => {
+      if (checkCollisions(this.player, healthPotion)) {
+        this.player.health = 100;
+        this.healthPotion?.healthPotions.splice(i, 1);
+      }
+    });
+  }
+
+  private scrollIsPicked(): void {
+    if (this.player.isOnPlatform) {
+      //check if he is picking the kunais
+      this.scroll?.localScroll.forEach((kunai, i) => {
+        if (checkCollisions(this.player, kunai)) {
+          this.scroll?.localScroll.splice(i, 1);
+          this.player.increaseScrollCount();
+          this.player.isScrollCollected = true;
+        }
+      });
+    }
   }
 
   /**
@@ -337,7 +389,6 @@ export class Game implements Drawable {
       checkCollisions(this.player, this.enemy)
     ) {
       if (this.player.isAttacking && this.legitHit()) {
-        console.log(this.enemy.health);
         this.enemy.decreaseHealth(this.player.damageLevel);
       }
       if (this.enemy.isAttacking && this.legitHit()) {
@@ -381,6 +432,7 @@ export class Game implements Drawable {
         this.hasKunaiLeft = false;
         this.enemy.hitEffect(this.player.isTurningLeft);
         this.kunai.splice(index, 1);
+
         if (checkCollisions(kunai, this.enemy)) {
           this.enemy.decreaseHealth(kunai.damageLevel);
         }

@@ -2,6 +2,7 @@ import { AttackType, Character, Position, Size } from "../interfaces/interface";
 import { getEnemySprite } from "../utils/getEnemySprite";
 import Level_1_Sublevel_1_Enemy_Attack from "../assets/Images/enemy/enemyAttacking.png";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
+import { Player } from "./player";
 
 /**
  * Enum representing the different animation states.
@@ -387,6 +388,26 @@ export class BaseEnemy implements Character {
 
     if (this.position.x < 0) {
       this.position.x = 0;
+    }
+  }
+
+  /**
+   * Automate enemy behavior to interact with the player.
+   */
+  automateBehavior(player: Player): void {
+    // Calculate the distance between the enemy and the player
+    const distanceToPlayer =
+      player.position.x - this.position.x + player.size.width / 2;
+
+    // Move towards the player if not close enough to attack
+    if (Math.abs(distanceToPlayer) > this.size.width) {
+      if (distanceToPlayer > 0) {
+        this.move("moveRight");
+      } else {
+        this.move("moveLeft");
+      }
+    } else {
+      this.move("Attack");
     }
   }
 

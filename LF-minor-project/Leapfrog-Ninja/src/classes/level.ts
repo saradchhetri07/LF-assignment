@@ -1,6 +1,5 @@
 import { Drawable, Updatable } from "../interfaces/interface";
 import { BaseEnemy } from "./enemy";
-import { Item } from "./item";
 import { Obstacle } from "./obstacle";
 
 /**
@@ -45,8 +44,6 @@ export class Level implements Drawable, Updatable {
    * @returns {BaseEnemy} The enemy for the current sub-level.
    */
   getCurrentEnemy(): BaseEnemy {
-    console.log("current level enemy is", this.enemies);
-
     return this.enemies[this.subLevel];
   }
 

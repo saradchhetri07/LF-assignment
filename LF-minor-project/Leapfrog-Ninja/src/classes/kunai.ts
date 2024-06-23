@@ -2,13 +2,9 @@ import { Platform } from "./../interfaces/interface";
 import { Level } from "./level";
 import { Player } from "../classes/player";
 import kunaiImage from "../assets/Images/player/kunaiIcon.png";
-
+import leftKunaiImage from "../assets/Images/enemy/kunaiLeft.png";
 interface Drawable {
   display(context: CanvasRenderingContext2D): void;
-}
-
-interface Pickable {
-  isPickedUp(player: Player): boolean;
 }
 
 interface Position {
@@ -21,16 +17,19 @@ interface Size {
   height: number;
 }
 
-export class Kunai implements Drawable, Pickable {
+export class Kunai implements Drawable {
   position: Position;
   Level: number;
   size: Size;
   count: number;
   image: HTMLImageElement;
+  leftImage: HTMLImageElement;
   damageLevel: number = 4;
   isRightDirection: boolean;
   velocity: { x: number; y: number } = { x: 8, y: 0 };
   kunaisOnPlatform: Kunai[] = [];
+  isOnCorretPlatform: boolean = false;
+  verticalOffset: number = 40;
 
   constructor(
     x: number,
@@ -46,6 +45,8 @@ export class Kunai implements Drawable, Pickable {
     this.image.src = kunaiImage;
     this.isRightDirection = isRightDirection;
     this.Level = level;
+    this.leftImage = new Image();
+    this.leftImage.src = leftKunaiImage;
   }
 
   increaseCount(): void {
@@ -55,7 +56,7 @@ export class Kunai implements Drawable, Pickable {
   display(context: CanvasRenderingContext2D): void {
     context.drawImage(
       this.image,
-      this.position.x,
+      this.position.x - 30,
       this.position.y,
       this.size.width,
       this.size.height
@@ -64,7 +65,6 @@ export class Kunai implements Drawable, Pickable {
 
   makeKunai(platforms: Platform[], kunaiNumber: number) {
     const kunais: Kunai[] = [];
-    console.log("came to make kunais");
     for (let i = 0; i < platforms.length; i++) {
       const platformLevel = platforms[i].level;
       const KunaiHorizontalGap = 50; // Horizontal gap between Kunais
@@ -72,17 +72,17 @@ export class Kunai implements Drawable, Pickable {
         for (let j = 0; j < kunaiNumber; j++) {
           const kunai = new Kunai(
             platforms[i].x + KunaiHorizontalGap * j,
-            platforms[i].y,
+            platforms[i].y - this.verticalOffset,
             this.count,
             false,
             this.Level
           );
+          kunai.isOnCorretPlatform = true;
           kunais.push(kunai);
         }
       }
     }
     this.kunaisOnPlatform = kunais;
-    console.log(this.kunaisOnPlatform);
   }
 
   incrementKunaiLevel() {
@@ -90,8 +90,6 @@ export class Kunai implements Drawable, Pickable {
   }
 
   clearkunais() {
-    console.log("came to clearing kunais");
-
     this.kunaisOnPlatform = [];
   }
 
@@ -100,8 +98,6 @@ export class Kunai implements Drawable, Pickable {
   }
 
   placeKunai(context: CanvasRenderingContext2D): void {
-    console.log("came to draw the kunais");
-
     this.kunaisOnPlatform.forEach((kunai) => {
       context.drawImage(
         this.image,
@@ -121,24 +117,12 @@ export class Kunai implements Drawable, Pickable {
     });
   }
 
-  printKunaiStatus() {
-    console.log("kunai status", this);
-  }
-
   update(deltaTime: number, isRight: boolean) {
     if (this.isRightDirection) {
       this.position.x += (this.velocity.x * deltaTime) / 16.67;
     } else {
+      this.image = this.leftImage;
       this.position.x -= (this.velocity.x * deltaTime) / 16.67;
     }
-  }
-
-  isPickedUp(player: Player): boolean {
-    return (
-      player.position.x + player.size.width >= this.position.x &&
-      player.position.x <= this.position.x + this.size.width &&
-      player.position.y + player.size.height >= this.position.y &&
-      player.position.y <= this.position.y + this.size.height
-    );
   }
 }

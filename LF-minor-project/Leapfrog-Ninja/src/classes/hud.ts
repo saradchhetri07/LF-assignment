@@ -1,3 +1,4 @@
+import { Scroll } from "./scroll";
 import { BaseEnemy } from "./enemy";
 import { Drawable, Updatable } from "../interfaces/interface";
 import { Player } from "./player";
@@ -13,6 +14,7 @@ export class HUD implements Drawable, Updatable {
   time: number = 0;
   ninjaLife: number; // To display the ninja's life
   enemyLives: number[]; // To display the enemies' lives
+  scroll: Scroll;
 
   /**
    * Create a new HUD.
@@ -22,6 +24,7 @@ export class HUD implements Drawable, Updatable {
     this.baseEnemy = enemy;
     this.ninjaLife = 4; // Initialize ninja's life
     this.enemyLives = []; // Initialize enemies' lives
+    this.scroll = new Scroll(0, 0, 1);
   }
 
   /**
@@ -43,10 +46,21 @@ export class HUD implements Drawable, Updatable {
 
     // // Draw score
     // context.fillText(`Score: ${this.score}`, 20, 30);
+    context.fillText(
+      `${this.player.getScrollCount()}`,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 60,
+      90
+    );
+
+    context.drawImage(
+      this.scroll.image,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 50,
+      100,
+      30,
+      60
+    );
 
     // Draw time
-
-    // Draw stars
     context.fillText(
       `${this.player.kunaiCount}`,
       CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 8,
@@ -56,7 +70,7 @@ export class HUD implements Drawable, Updatable {
     context.drawImage(
       this.player.kunaiImage,
       CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
-      90,
+      100,
       30,
       60
     );

@@ -1,12 +1,9 @@
+import { Platform } from "./../interfaces/interface";
 import { Player } from "../classes/player";
 import scrollImage from "../assets/Images/gameplay/scroll.png";
 
 interface Drawable {
   display(context: CanvasRenderingContext2D): void;
-}
-
-interface Pickable {
-  isPickedUp(player: Player): boolean;
 }
 
 interface Position {
@@ -19,31 +16,54 @@ interface Size {
   height: number;
 }
 
-export class Scroll implements Drawable, Pickable {
+export class Scroll implements Drawable {
   position: Position;
   size: Size;
   image: HTMLImageElement;
   count: number = 0;
+  Level: number = 1;
+  localScroll: Scroll[] = [];
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, level: number) {
     this.position = { x, y };
     this.size = { width: 80, height: 80 };
     this.image = new Image();
     this.image.src = scrollImage;
+    this.Level = level;
   }
 
   increaseCount(): void {
     this.count++;
   }
 
+  //making scroll list for all levels
+  makeScroll(platforms: Platform[]): void {
+    const scrolls: Scroll[] = [];
+    for (let i = 0; i < platforms.length; i++) {
+      console.log("inside makeScroll");
+
+      const platformLevel = platforms[i].level;
+      if (this.Level == platformLevel && (i + 1) % 2 == 0) {
+        const scroll = new Scroll(platforms[i].x, platforms[i].y, this.Level);
+        scrolls.push(scroll);
+      }
+    }
+    this.localScroll = scrolls;
+  }
+
+  //placing the scrolls as per level
   display(context: CanvasRenderingContext2D): void {
-    context.drawImage(
-      this.image,
-      this.position.x,
-      this.position.y - this.size.height,
-      this.size.width,
-      this.size.height
-    );
+    this.localScroll.forEach((scroll) => {
+      console.log("came to draw scroll");
+
+      context.drawImage(
+        this.image,
+        scroll.position.x,
+        scroll.position.y - scroll.size.height,
+        this.size.width,
+        this.size.height
+      );
+    });
 
     // Set the stroke style to red
     context.strokeStyle = "red";
@@ -57,14 +77,13 @@ export class Scroll implements Drawable, Pickable {
     );
   }
 
-  update(deltaTime: number) {}
-
-  isPickedUp(player: Player): boolean {
-    return (
-      player.position.x + player.size.width >= this.position.x &&
-      player.position.x <= this.position.x + this.size.width &&
-      player.position.y + player.size.height >= this.position.y &&
-      player.position.y <= this.position.y + this.size.height
-    );
+  clearScroll(): void {
+    this.localScroll = [];
   }
+
+  incrementScrollLevel(): void {
+    this.Level++;
+  }
+
+  update(deltaTime: number) {}
 }

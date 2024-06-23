@@ -14,7 +14,6 @@ import {
 
 import { BaseEnemy } from "./enemy";
 import { makeLevelImages } from "../utils/levelImages";
-import { Item } from "./item";
 import { Obstacle } from "./obstacle";
 
 /**
@@ -48,16 +47,15 @@ export class LevelManager {
         this.enemies[level - 1]
       );
       localLevels.push(newLevel);
-      console.log(newLevel);
     }
     return localLevels;
   }
 
   //print all the level for debugging
   printAllLevel(): void {
-    this.levels.forEach((level) => {
-      console.log("level is", level);
-    });
+    // this.levels.forEach((level) => {
+    //   console.log("level is", level);
+    // });
   }
   /**
    * Load the current level.

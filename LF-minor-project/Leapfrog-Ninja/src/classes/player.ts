@@ -57,6 +57,10 @@ export class Player implements Character {
   maxFrame: number;
   velocity: { x: number; y: number };
   isJumping: boolean;
+
+  private scrollCount: number = 0;
+  isScrollCollected: boolean = false;
+
   animationState: AnimationState;
   animationFrameRate: number;
   animationFrameCount: number;
@@ -68,6 +72,8 @@ export class Player implements Character {
   playerHead: HTMLImageElement;
   kunaiImage: HTMLImageElement;
   kunaiWeapon: Kunai[] = [];
+  isOnGround: boolean = true;
+  isOnPlatform: boolean = false;
 
   isTurningLeft: boolean = false;
   isTurningRight: boolean = true;
@@ -287,12 +293,6 @@ export class Player implements Character {
    */
   handlePlatformCollisions(platforms: Platform[]): void {
     for (const platform of platforms) {
-      // a.position.x < b.position.x + b.size.width && // a's left edge is to the left of b's right edge
-      // a.position.x + a.size.width > b.position.x && // a's right edge is to the right of b's left edge
-      // a.position.y < b.position.y + b.size.height && // a's top edge is above b's bottom edge
-      // a.position.y + a.size.height > b.position.y && // a's bottom edge is below b's top edge
-      // a.position.y + a.size.height < b.position.y + b.size.height // a's bottom edge is above b's bottom edge
-
       if (
         platform.level == this.level &&
         this.position.x < platform.x + platform.width &&
@@ -304,6 +304,8 @@ export class Player implements Character {
         this.position.y = platform.y - this.size.height;
         this.velocity.y = 0;
         this.isJumping = false;
+        this.isOnGround = false;
+        this.isOnPlatform = true;
       }
 
       // if (
@@ -335,15 +337,29 @@ export class Player implements Character {
   increaseLevel(): void {
     this.level++;
   }
+
+  //increase scroll collected count
+  increaseScrollCount(): void {
+    this.scrollCount++;
+  }
+
+  //getter for scroll count
+  getScrollCount(): number {
+    return this.scrollCount;
+  }
+
   update(deltaTime: number, platforms: Platform[]): void {
     if (this.health <= 0) {
       this.animationState = AnimationState.Dead;
     }
+    //if player is on the ground change some boolean values
+    if (this.position.y >= this.initialY) {
+      this.isOnGround = true;
+      this.isOnPlatform = false;
+    }
 
     // //ifplayer reaches max height
     if (this.position.y <= this.jumpHeight) {
-      console.log("reached max height");
-
       this.velocity.y = -this.gravity;
       this.isJumping = false;
     }
@@ -455,7 +471,7 @@ export class Player implements Character {
         NINJA_CONSTANT.PLAYER_HEIGHT -
         NINJA_CONSTANT.VERTICAL_OFFSET,
     };
-    this.health = 100; // Reset health or other properties
+    this.health = this.health; // Reset health or other properties
     this.kunaiCount = this.kunaiCount; // Reset kunai count
   }
 
