@@ -1,18 +1,12 @@
+import { assetsManager } from "./AssetsManager";
 import {
-  Character,
+  ICharacter,
   Position,
   Size,
   AttackType,
   Platform,
 } from "../interfaces/interface";
-import playerIdleImage from "../assets/Images/player/ninjaBoyIdle.png";
-import playerMoveImage from "../assets/Images/player/ninjaBoyMove.png";
-import playerAttackImage from "../assets/Images/player/ninjaBoyAttack.png";
-import playerJumpImage from "../assets/Images/player/ninjaBoyJumping.png";
-import playerRunImage from "../assets/Images/player/ninjaBoyRunning.png";
-import playerDeadImage from "../assets/Images/player/ninjaBoyDead.png";
-import playerThrowImage from "../assets/Images/player/ninjaBoyThrowing.png";
-import playerHeadImage from "../assets/Images/player/ninjaBoyIcon.png";
+
 import kunaiImage from "../assets/Images/player/kunaiDown.png";
 
 import {
@@ -22,19 +16,20 @@ import {
   NINJA_SPRITE_RUNNING,
 } from "../constants/constants";
 import { Kunai } from "./kunai";
+import { Character } from "../enums/character";
+import { SoundMode } from "../enums/sound";
 
 enum AnimationState {
   Idle,
   Run,
   Attack,
   ThrowWeapon,
-  Poke,
   Dead,
   moveUp,
 }
 
 interface AnimationSettings {
-  image: string;
+  image: HTMLImageElement;
   maxFrame: number;
   frameWidth: number;
   frameHeight: number;
@@ -43,7 +38,8 @@ interface AnimationSettings {
   animationFrameRate: number;
 }
 
-export class Player implements Character {
+export class Player implements ICharacter {
+  private chosenCharater: Character = Character.Male;
   position: Position;
   damageLevel: number;
   size: Size;
@@ -51,12 +47,15 @@ export class Player implements Character {
   image: HTMLImageElement;
   power: number;
   maxHealth: number;
-  kunaiCount: number = 5;
+  kunaiCount: number = 20;
   frameX: number;
   frameY: number;
   maxFrame: number;
   velocity: { x: number; y: number };
   isJumping: boolean;
+  soundStatus: SoundMode = SoundMode.ON;
+  frameBuffer: number = 10;
+  elapsedFrame: number = 0;
 
   private scrollCount: number = 0;
   isScrollCollected: boolean = false;
@@ -74,35 +73,46 @@ export class Player implements Character {
   kunaiWeapon: Kunai[] = [];
   isOnGround: boolean = true;
   isOnPlatform: boolean = false;
+  isBoy: boolean = true;
 
   isTurningLeft: boolean = false;
   isTurningRight: boolean = true;
 
-  private initialY: number;
+  initialY: number;
   private jumpHeight: number = 100;
   private verticalFrameTimer: number | null; // Timer for vertical movement
+  private heightFactor: number = 1.1;
+  private widthFactor: number = 0.6;
+  private attackTimer: number = 0; // Add attackTimer
 
   private animationSettings: { [key in AnimationState]: AnimationSettings };
 
   constructor(
     position: Position,
     size: Size,
-    imageSrc: string,
+    imageSrc: HTMLImageElement,
     maxFrame: number,
     health: number,
-    level: number
+    level: number,
+    chosenCharacter: Character,
+    soundStatus: SoundMode
   ) {
+    chosenCharacter == Character.Male
+      ? (this.isBoy = true)
+      : (this.isBoy = false);
     this.position = position;
     this.size = size;
-    this.playerHead = new Image();
-    this.playerHead.src = playerHeadImage;
+    this.playerHead = this.isBoy
+      ? assetsManager.sprites.NINJABOYICON
+      : assetsManager.sprites.NINJAGIRLICON;
+
     this.level = level;
+    this.soundStatus = soundStatus;
 
     this.health = health;
     this.maxHealth = 100;
 
-    this.image = new Image();
-    this.image.src = imageSrc;
+    this.image = imageSrc;
     this.kunaiImage = new Image();
     this.kunaiImage.src = kunaiImage;
     //kunai weapon declare
@@ -115,7 +125,7 @@ export class Player implements Character {
     this.velocity = { x: 0, y: 0 };
     this.isJumping = false;
 
-    this.damageLevel = 6; //out of 10
+    this.damageLevel = 4; //out of 10
 
     this.animationState = AnimationState.Idle;
     this.animationFrameRate = 10; // Adjust based on needs
@@ -128,7 +138,9 @@ export class Player implements Character {
     this.verticalFrameTimer = null; // Initialize vertical frame timer
     this.animationSettings = {
       [AnimationState.Idle]: {
-        image: playerIdleImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYJUMPING
+          : assetsManager.sprites.NINJAGIRLJUMPING,
         maxFrame: 10,
         frameWidth: 262 / 2,
         frameHeight: 1400 / 10,
@@ -137,7 +149,9 @@ export class Player implements Character {
         animationFrameRate: 10, // Add this line
       },
       [AnimationState.Run]: {
-        image: playerMoveImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYMOVING
+          : assetsManager.sprites.NINJABOYMOVING,
         maxFrame: 10,
         frameWidth: 262 / 2,
         frameHeight: 1400 / 10,
@@ -145,8 +159,11 @@ export class Player implements Character {
         rows: 10,
         animationFrameRate: 10,
       },
+
       [AnimationState.Attack]: {
-        image: playerAttackImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYATTACKING
+          : assetsManager.sprites.NINJAGIRLATTACKING,
         maxFrame: 10,
         frameWidth: size.width,
         frameHeight: size.height,
@@ -155,7 +172,9 @@ export class Player implements Character {
         animationFrameRate: 10,
       },
       [AnimationState.ThrowWeapon]: {
-        image: playerThrowImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYTHROWING
+          : assetsManager.sprites.NINJAGIRLTHROWING,
         maxFrame: 10,
         frameWidth: size.width,
         frameHeight: size.height,
@@ -163,17 +182,10 @@ export class Player implements Character {
         rows: 10,
         animationFrameRate: 10,
       },
-      [AnimationState.Poke]: {
-        image: playerMoveImage,
-        maxFrame: 10,
-        frameWidth: size.width,
-        frameHeight: size.height,
-        columns: 1,
-        rows: 10,
-        animationFrameRate: 10,
-      },
       [AnimationState.Dead]: {
-        image: playerDeadImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYDEAD
+          : assetsManager.sprites.NINJAGIRLDYING,
         maxFrame: 10,
         frameWidth: size.width,
         frameHeight: size.height,
@@ -182,7 +194,9 @@ export class Player implements Character {
         animationFrameRate: 10,
       },
       [AnimationState.moveUp]: {
-        image: playerJumpImage,
+        image: this.isBoy
+          ? assetsManager.sprites.NINJABOYJUMPING
+          : assetsManager.sprites.NINJAGIRLJUMPING,
         maxFrame: 10,
         frameWidth: size.width,
         frameHeight: size.height,
@@ -202,6 +216,11 @@ export class Player implements Character {
 
       case "moveLeft":
         // if (this.isJumping) break;
+        if (this.soundStatus == SoundMode.ON && this.kunaiCount > 0) {
+          const movingAudio = assetsManager.audios.SWING;
+          movingAudio.play();
+        }
+
         this.isTurningLeft = true;
         this.isTurningRight = false;
         this.velocity.x = -8;
@@ -227,10 +246,21 @@ export class Player implements Character {
         break;
 
       case "Attack":
-        this.animationState = AnimationState.Attack;
+        if (Date.now() - this.attackTimer > 500 || this.attackTimer == 0) {
+          if (this.soundStatus == SoundMode.ON) {
+            const swingSound = assetsManager.audios.SWING;
+            swingSound.play();
+          }
+          this.animationState = AnimationState.Attack;
+          this.attackTimer = Date.now(); // Reset the attackTimer
+        }
         break;
 
       case "ThrowWeapon":
+        if (this.soundStatus == SoundMode.ON) {
+          const throwSound = assetsManager.audios.THROW;
+          throwSound.play();
+        }
         this.animationState = AnimationState.ThrowWeapon;
         break;
 
@@ -255,8 +285,12 @@ export class Player implements Character {
       frameHeight, // Use frameHeight for the source height
       this.position.x,
       this.position.y,
-      this.size.width,
-      this.size.height
+      this.animationState == AnimationState.Attack
+        ? this.size.width
+        : this.size.width * this.widthFactor,
+      this.animationState == AnimationState.Attack
+        ? this.size.height * this.heightFactor
+        : this.size.height
     );
 
     // Set the stroke style to red
@@ -306,30 +340,8 @@ export class Player implements Character {
         this.isJumping = false;
         this.isOnGround = false;
         this.isOnPlatform = true;
+        console.log("is on platform?", this.isOnPlatform);
       }
-
-      // if (
-      //   this.position.y + this.size.height / 1.2 <= platform.y &&
-      //   this.position.x >= platform.x &&
-      //   this.position.x + this.size.width / 1.2 <= platform.x + platform.width
-      // ) {
-      //   console.log("hang onto it");
-      //   this.position.y = platform.y - this.size.height;
-      //   this.velocity.y = 0;
-      //   // this.isJumping = false;
-      // }
-      // if (
-      //   this.position.x < platform.x + platform.width &&
-      //   this.position.x + this.size.width > platform.x &&
-      //   this.position.y + this.size.height <= platform.y &&
-      //   this.position.y + this.size.height + this.velocity.y >= platform.y
-      // ) {
-      //   console.log("came to handle collision");
-      //   // Adjust player's position to sit on top of the platform
-      //   this.position.y = platform.y - this.size.height;
-      //   this.velocity.y = 0;
-      //   this.isJumping = false;
-      // }
     }
   }
 
@@ -364,20 +376,12 @@ export class Player implements Character {
       this.isJumping = false;
     }
 
-    // if (this.isJumping) {
-    //   console.log("is jumping ");
-
-    //   this.position.y += (this.velocity.y * deltaTime) / 16.67;
-    //   if (this.position.y <= this.initialY - this.jumpHeight) {
-    //     this.velocity.y = this.gravity;
-    //   }
-    // }
-
     //detect right wall collision
     if (this.position.x + this.size.width >= CANVAS_DIMENSIONS.CANVAS_WIDTH) {
       this.position.x = CANVAS_DIMENSIONS.CANVAS_WIDTH - this.size.width;
     }
 
+    //dont let player go out of  ground position
     if (this.position.y > this.initialY) {
       this.position.y = this.initialY;
     }
@@ -387,32 +391,43 @@ export class Player implements Character {
     }
 
     if (this.animationState == AnimationState.Run) {
-      this.image.src = playerMoveImage;
+      this.image = this.isBoy
+        ? assetsManager.sprites.NINJABOYRUNNING
+        : assetsManager.sprites.NINJAGIRLRUNNING;
       this.position.x += (this.velocity.x * deltaTime) / 16.67;
     }
 
     if (this.animationState == AnimationState.Idle) {
-      this.image.src = playerIdleImage;
+      this.image = this.isBoy
+        ? assetsManager.sprites.NINJABOYIDLE
+        : assetsManager.sprites.NINJAGIRLIDLE;
       this.isAttacking = false;
       this.isJumping = false;
     }
 
     if (this.animationState == AnimationState.Attack) {
-      this.isAttacking = true;
-      this.image.src = playerAttackImage;
+      (this.image = this.isBoy
+        ? assetsManager.sprites.NINJABOYATTACKING
+        : assetsManager.sprites.NINJAGIRLATTACKING),
+        (this.isAttacking = true);
     }
 
     if (this.animationState == AnimationState.moveUp && this.isJumping) {
-      this.image.src = playerJumpImage;
       this.position.y += (this.velocity.y * deltaTime) / 16.67;
     }
 
     if (this.animationState == AnimationState.ThrowWeapon) {
-      this.image.src = playerThrowImage;
+      console.log("player state throw weapon");
+
+      this.image = this.isBoy
+        ? assetsManager.sprites.NINJABOYTHROWING
+        : assetsManager.sprites.NINJAGIRLTHROWING;
     }
 
     if (this.animationState == AnimationState.Dead) {
-      this.image.src = playerDeadImage;
+      this.image = this.isBoy
+        ? assetsManager.sprites.NINJABOYDEAD
+        : assetsManager.sprites.NINJAGIRLDEAD;
       this.isDead = true;
     }
     if (this.position.x < 0) this.position.x = 0;
@@ -436,13 +451,18 @@ export class Player implements Character {
 
     // Handle vertical frame timer
     if (this.animationState == AnimationState.Attack) {
+      this.elapsedFrame++;
       if (!this.verticalFrameTimer) {
         this.verticalFrameTimer = setTimeout(() => {
-          this.frameY =
-            (this.frameY + 1) %
-            this.animationSettings[this.animationState].rows;
-          this.verticalFrameTimer = null; // Reset timer after the frame update
+          if (this.elapsedFrame % this.frameBuffer == 0) {
+            this.frameY =
+              (this.frameY + 1) %
+              this.animationSettings[this.animationState].rows;
+          }
         }, 1000 / currentAnimationFrameRate); // Delay for the vertical frames
+      }
+      if (this.frameY == maxFrame) {
+        this.elapsedFrame = 0;
       }
     } else if (this.animationState == AnimationState.Dead) {
       if (this.animationFrameCount++ >= currentAnimationFrameRate) {

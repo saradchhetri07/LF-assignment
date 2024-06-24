@@ -1,15 +1,25 @@
+import { Sound } from "./interfaces/interface";
 import { assetsManager } from "./classes/AssetsManager";
 import "./style.css";
 import { Game } from "./classes/game";
 import { CANVAS_DIMENSIONS } from "./constants/constants";
-import { Mode } from "./enums/mode";
 import "./style.css";
 import { drawStartScreen } from "./utils/startScreen";
+import { Character } from "./enums/character";
+import { GameDifficulty } from "./enums/difficulty";
+import { GameMode } from "./enums/mode";
+import { SoundMode } from "./enums/sound";
 
 window.addEventListener("load", () => {
   const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+
   canvas.width = CANVAS_DIMENSIONS.CANVAS_WIDTH;
   canvas.height = CANVAS_DIMENSIONS.CANVAS_HEIGHT;
+
+  let chosenCharacter = Character.None;
+  let selectedMode: GameDifficulty = GameDifficulty.Easy; // Default mode
+  let gameMode: GameMode = GameMode.Multiplayer;
+  let soundModeStatus: SoundMode = SoundMode.ON;
 
   if (!canvas) {
     console.log("No canvas found");
@@ -41,7 +51,49 @@ window.addEventListener("load", () => {
       "viewEnemiesID"
     ) as HTMLButtonElement;
 
+    const difficultyButton = document.getElementById(
+      "difficulty"
+    ) as HTMLButtonElement;
+
+    const modeButton = document.getElementById("playmode") as HTMLButtonElement;
+
     const okButton = document.getElementById("okID") as HTMLButtonElement;
+    const soundButton = document.getElementById("soundId") as HTMLButtonElement;
+
+    const ninjaBoyButton = document.getElementById(
+      "ninjaBoy"
+    ) as HTMLButtonElement;
+
+    const ninjaGirlButton = document.getElementById(
+      "ninjaGirl"
+    ) as HTMLButtonElement;
+
+    const modeSelector = document.getElementById(
+      "modeSelector"
+    ) as HTMLDivElement;
+
+    const easyRadio = document.getElementById("easy") as HTMLInputElement;
+    const mediumRadio = document.getElementById("medium") as HTMLInputElement;
+    const difficultRadio = document.getElementById(
+      "difficult"
+    ) as HTMLInputElement;
+
+    const soundMode = document.getElementById(
+      "soundSelector"
+    ) as HTMLDivElement;
+    const onRadio = document.getElementById("onRadio") as HTMLInputElement;
+    const offRadio = document.getElementById("onRadio") as HTMLInputElement;
+
+    const gameModeSelector = document.getElementById(
+      "gameModeSelector"
+    ) as HTMLDivElement;
+    const computerRadio = document.getElementById(
+      "computer"
+    ) as HTMLInputElement;
+
+    const multiPlayerRadio = document.getElementById(
+      "multiPlayer"
+    ) as HTMLInputElement;
 
     playGameButton.style.display = "block";
     playGameButton.style.marginTop = "40px";
@@ -55,6 +107,35 @@ window.addEventListener("load", () => {
     chooseCharacterButton.style.marginTop = "40px";
     chooseCharacterButton.style.marginLeft = "20px";
 
+    difficultyButton.style.display = "block";
+    difficultyButton.style.marginTop = "40px";
+    difficultyButton.style.marginLeft = "20px";
+
+    modeButton.style.display = "block";
+    modeButton.style.marginTop = "40px";
+    modeButton.style.marginLeft = "20px";
+
+    soundButton.style.display = "block";
+    soundButton.style.marginTop = "40px";
+    soundButton.style.marginLeft = "20px";
+
+    soundButton.addEventListener("click", () => {
+      ctx.clearRect(
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+      clearStartButton();
+      ctx.drawImage(
+        assetsManager.sprites.DIFFICULTYSCREEN,
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+      soundMode.style.display = "block";
+    });
     // // Add event listeners for buttons
     playGameButton.addEventListener("click", () => {
       ctx.clearRect(
@@ -63,9 +144,37 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_WIDTH,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
-      // ctx.drawImage(assetsManager.sprites.)
-      // const game = new Game(canvas, ctx, Mode.Multiplayer);
-      // game.start();
+      clearStartButton();
+      okButton.style.display = "block";
+      if (gameMode == GameMode.Computer) {
+        ctx.drawImage(
+          assetsManager.sprites.DIFFICULTYSCREEN,
+          0,
+          0,
+          CANVAS_DIMENSIONS.CANVAS_WIDTH,
+          CANVAS_DIMENSIONS.CANVAS_HEIGHT
+        );
+        // Draw text on canvas
+        ctx.font = "20px Press Start 2P";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Get away from enemy",
+          CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 - 200,
+          CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2
+        );
+      } else {
+        ctx.drawImage(
+          assetsManager.sprites.CONTROLSCREEN,
+          0,
+          0,
+          CANVAS_DIMENSIONS.CANVAS_WIDTH,
+          CANVAS_DIMENSIONS.CANVAS_HEIGHT
+        );
+      }
+      okButton.addEventListener("click", () => {
+        okButton.style.display = "none";
+        startGame();
+      });
     });
 
     chooseCharacterButton.addEventListener("click", () => {
@@ -73,34 +182,40 @@ window.addEventListener("load", () => {
       playGameButton.style.display = "none";
       viewEnemiesButton.style.display = "none";
       chooseCharacterButton.style.display = "none";
+      difficultyButton.style.display = "none";
+      modeButton.style.display = "none";
+
       ctx.clearRect(
         0,
         0,
         CANVAS_DIMENSIONS.CANVAS_WIDTH,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
-      ctx.beginPath();
-      ctx.fillStyle = "black";
-      ctx.fillRect(
+      ctx.drawImage(
+        assetsManager.sprites.CHOOSECHARACTER,
         0,
         0,
         CANVAS_DIMENSIONS.CANVAS_WIDTH,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
+
       ctx.drawImage(
         assetsManager.sprites.MALECHARACTER,
         150,
-        100,
+        60,
         CANVAS_DIMENSIONS.CANVAS_WIDTH / 3,
         500
       );
       ctx.drawImage(
         assetsManager.sprites.FEMALECHARACTER,
         400,
-        100,
+        60,
         CANVAS_DIMENSIONS.CANVAS_WIDTH / 3,
         500
       );
+      clearStartButton();
+      ninjaBoyButton.style.display = "block";
+      ninjaGirlButton.style.display = "block";
     });
 
     viewEnemiesButton.addEventListener("click", () => {
@@ -112,9 +227,7 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
 
-      playGameButton.style.display = "none";
-      viewEnemiesButton.style.display = "none";
-      chooseCharacterButton.style.display = "none";
+      clearStartButton();
 
       okButton.style.display = "block";
       okButton.style.marginTop = "40px";
@@ -129,13 +242,131 @@ window.addEventListener("load", () => {
       );
     });
 
-    okButton.addEventListener("click", () => {
-      okButton.style.display = "none";
-      okButton.style.marginTop = "40px";
+    ninjaBoyButton.addEventListener("click", () => {
+      chosenCharacter = Character.Male;
+      ninjaBoyButton.style.display = "none";
+      ninjaGirlButton.style.display = "none";
       playGameButton.style.display = "block";
       viewEnemiesButton.style.display = "block";
       chooseCharacterButton.style.display = "block";
+      startGame();
+    });
+
+    ninjaGirlButton.addEventListener("click", () => {
+      chosenCharacter = Character.Female;
+      ninjaGirlButton.style.display = "none";
+      ninjaBoyButton.style.display = "none";
+      playGameButton.style.display = "block";
+      viewEnemiesButton.style.display = "block";
+      chooseCharacterButton.style.display = "block";
+      startGame();
+    });
+
+    okButton.addEventListener("click", () => {
+      okButton.style.display = "none";
+      okButton.style.marginTop = "40px";
+      modeSelector.style.display = "none";
+      gameModeSelector.style.display = "none";
+      initializeStartButton();
       drawStartScreen(ctx);
     });
+
+    difficultyButton.addEventListener("click", () => {
+      ctx.clearRect(
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+      clearStartButton();
+      ctx.drawImage(
+        assetsManager.sprites.DIFFICULTYSCREEN,
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+
+      modeSelector.style.display = "block";
+      okButton.style.display = "block";
+    });
+
+    modeSelector.addEventListener("change", () => {
+      if (easyRadio.checked) {
+        selectedMode = GameDifficulty.Easy;
+      } else if (mediumRadio.checked) {
+        selectedMode = GameDifficulty.Medium;
+      } else if (difficultRadio.checked) {
+        selectedMode = GameDifficulty.Hard;
+      }
+    });
+
+    gameModeSelector.addEventListener("change", () => {
+      if (computerRadio.checked) {
+        gameMode = GameMode.Computer;
+      } else {
+        gameMode = GameMode.Multiplayer;
+      }
+    });
+
+    modeButton.addEventListener("click", () => {
+      ctx.clearRect(
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+      clearStartButton();
+      ctx.drawImage(
+        assetsManager.sprites.DIFFICULTYSCREEN,
+        0,
+        0,
+        CANVAS_DIMENSIONS.CANVAS_WIDTH,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT
+      );
+
+      gameModeSelector.style.display = "block";
+      okButton.style.display = "block";
+    });
+
+    onRadio.addEventListener("click", () => {
+      if (onRadio.checked) {
+        soundModeStatus = SoundMode.ON;
+      } else {
+        soundModeStatus = SoundMode.OFF;
+      }
+    });
+
+    function initializeStartButton(): void {
+      playGameButton.style.display = "block";
+      viewEnemiesButton.style.display = "block";
+      chooseCharacterButton.style.display = "block";
+      difficultyButton.style.display = "block";
+      modeButton.style.display = "block";
+    }
+
+    function clearStartButton(): void {
+      playGameButton.style.display = "none";
+      viewEnemiesButton.style.display = "none";
+      chooseCharacterButton.style.display = "none";
+      difficultyButton.style.display = "none";
+      modeButton.style.display = "none";
+      soundButton.style.display = "none";
+    }
+
+    function startGame() {
+      clearStartButton();
+      const game = new Game(
+        canvas,
+        ctx!,
+        //play with computer or multiplayer mode
+        gameMode,
+        chosenCharacter,
+        //difficulty mode
+        selectedMode,
+        soundModeStatus
+      );
+      game.start();
+    }
   });
 });

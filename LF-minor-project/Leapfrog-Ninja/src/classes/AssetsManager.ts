@@ -29,6 +29,7 @@ import healthPotion from "../assets/Images/gameplay/healthPotion.png";
 import staminaPotion from "../assets/Images/gameplay/staminaPotion.png";
 import maleCharacter from "../assets/Images/gameplay/maleCharacter.png";
 import femaleCharacter from "../assets/Images/gameplay/femaleCharacter.png";
+import difficultyScreen from "../assets/Images/background/difficultyScreen.jpeg";
 
 import background1 from "../assets/Images/background/platBackground-CH1.png";
 import background2 from "../assets/Images/background/background-CH2.png";
@@ -64,7 +65,8 @@ import orkIcon from "../assets/Images/enemy/orkIcon.png";
 import orkIdle from "../assets/Images/enemy/orkIdle.png";
 import orkAttacking from "../assets/Images/enemy/orkAttacking.png";
 import orkRunning from "../assets/Images/enemy/orkRunning.png";
-import orkDying from "../assets/Images/enemy/enemyDead.png";
+import orkDying from "../assets/Images/enemy/ork2Dying.png";
+
 import ork2Icon from "../assets/Images/enemy/ork2Icon.png";
 import ork2Idle from "../assets/Images/enemy/ork2Idle.png";
 import ork2Attacking from "../assets/Images/enemy/ork2Attacking.png";
@@ -123,7 +125,6 @@ class AssetsManager {
       spriteImage.src = fileName;
       spriteImage.onload = () => {
         this.assetsStillLoading--;
-        console.log(`Loaded sprite: ${fileName}`);
       };
       spriteImage.onerror = (error) => {
         console.error(`Error loading sprite: ${fileName}`, error);
@@ -134,11 +135,9 @@ class AssetsManager {
 
     const loadAudio = (fileName: string): HTMLAudioElement => {
       this.assetsStillLoading++;
-      console.log(`Loading audio: ${fileName}`);
       const audio = new Audio(fileName);
       audio.oncanplaythrough = () => {
         this.assetsStillLoading--;
-        console.log(`Loaded audio: ${fileName}`);
       };
       audio.onerror = (error) => {
         console.error(`Error loading audio: ${fileName}`, error);
@@ -172,6 +171,7 @@ class AssetsManager {
     this.sprites.CONTROLSCREEN = loadSprite(controlScreen);
     this.sprites.GAMEOVERSCREEN = loadSprite(gameOverScreen);
     this.sprites.CHOOSECHARACTER = loadSprite(chooseCharacter);
+    this.sprites.DIFFICULTYSCREEN = loadSprite(difficultyScreen);
     this.sprites.GAMECOMPLETED = loadSprite(gameCompleted);
     this.sprites.VIEWENEMIES = loadSprite(viewEnemies);
     this.sprites.LEVELCOMPLETED = loadSprite(levelCompleted);
@@ -199,36 +199,43 @@ class AssetsManager {
     this.sprites.NINJAGIRLDYING = loadSprite(ninjaGirlDying);
     this.sprites.NINJAGIRLSLIDING = loadSprite(ninjaGirlSliding);
     this.sprites.NINJAGIRLTHROWING = loadSprite(ninjaGirlThrowing);
+
     this.sprites.BANDITICON = loadSprite(banditIcon);
     this.sprites.BANDITIDLE = loadSprite(banditIdle);
     this.sprites.BANDITATTACKING = loadSprite(banditAttacking);
     this.sprites.BANDITRUNNING = loadSprite(banditRunning);
     this.sprites.BANDITDYING = loadSprite(banditDying);
+
     this.sprites.ORKICON = loadSprite(orkIcon);
     this.sprites.ORKIDLE = loadSprite(orkIdle);
     this.sprites.ORKATTACKING = loadSprite(orkAttacking);
     this.sprites.ORKRUNNING = loadSprite(orkRunning);
     this.sprites.ORKDYING = loadSprite(orkDying);
+
     this.sprites.ORK2ICON = loadSprite(ork2Icon);
     this.sprites.ORK2IDLE = loadSprite(ork2Idle);
     this.sprites.ORK2ATTACKING = loadSprite(ork2Attacking);
     this.sprites.ORK2RUNNING = loadSprite(ork2Running);
     this.sprites.ORK2DYING = loadSprite(ork2Dying);
+
     this.sprites.SAMURAIICON = loadSprite(samuraiIcon);
     this.sprites.SAMURAIDLE = loadSprite(samuraiIdle);
     this.sprites.SAMURAIATTACKING = loadSprite(samuraiAttacking);
     this.sprites.SAMURAIRUNNING = loadSprite(samuraiRunning);
     this.sprites.SAMURAIDYING = loadSprite(samuraiDying);
+
     this.sprites.SAMURAIHEAVYICON = loadSprite(samuraiHeavyIcon);
     this.sprites.SAMURAIHEAVYIDLE = loadSprite(samuraiHeavyIdle);
     this.sprites.SAMURAIHEAVYATTACKING = loadSprite(samuraiHeavyAttacking);
     this.sprites.SAMURAIHEAVYRUNNING = loadSprite(samuraiHeavyRunning);
     this.sprites.SAMURAIHEAVYDYING = loadSprite(samuraiHeavyDying);
+
     this.sprites.BOSSICON = loadSprite(bossIcon);
     this.sprites.BOSSIDLE = loadSprite(bossIdle);
     this.sprites.BOSSATTACKING = loadSprite(bossAttacking);
     this.sprites.BOSSRUNNING = loadSprite(bossRunning);
     this.sprites.BOSSDEAD = loadSprite(bossDead);
+
     this.sprites.AURA = loadSprite(aura);
     this.sprites.SCROLL = loadSprite(scroll);
     this.sprites.SWORD = loadSprite(sword);

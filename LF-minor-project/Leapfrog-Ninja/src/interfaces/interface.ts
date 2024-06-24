@@ -45,7 +45,7 @@ export interface Platform extends Position, Size {
   forPlacingKunai: boolean;
 }
 
-export interface Character extends Drawable, Movable, Collidable {
+export interface ICharacter extends Drawable, Movable, Collidable {
   position: Position;
   damageLevel: number;
   size: Size;

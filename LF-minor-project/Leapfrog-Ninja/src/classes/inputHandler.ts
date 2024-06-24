@@ -1,25 +1,16 @@
-/**
- * Class representing the input handler for the game.
- */
-
-import { AttackType, Character } from "../interfaces/interface";
+import { AttackType, ICharacter } from "../interfaces/interface";
 import { Game } from "./game";
 
 export class InputHandler {
-  private character: Character;
+  private character: ICharacter;
   private keys: Set<string>;
   private keyStates: Map<string, boolean>;
   private controlSchema: { [key: string]: string };
   private game: Game;
+  private attackCooldown: number = 0; //  attackCooldown
 
-  /**
-   * Create a new input handler.
-   * @param {Character} character - The character to control.
-   * @param {Object} controlSchema - The mapping of keys to actions.
-   * @param {Game} game - The game instance.
-   */
   constructor(
-    character: Character,
+    character: ICharacter,
     controlSchema: { [key: string]: string },
     game: Game
   ) {
@@ -34,11 +25,8 @@ export class InputHandler {
     window.addEventListener("click", this.handleMouseClick.bind(this));
   }
 
-  /**
-   * Handle key down events.
-   * @param {KeyboardEvent} event - The keyboard event.
-   */
   private handleKeyDown(event: KeyboardEvent): void {
+    // Ignore the keydown event if the key is already being processed
     if (!this.keyStates.get(event.key)) {
       this.keys.add(event.key);
       this.keyStates.set(event.key, true);
@@ -46,28 +34,19 @@ export class InputHandler {
     }
   }
 
-  /**
-   * Handle key up events.
-   * @param {KeyboardEvent} event - The keyboard event.
-   */
   private handleKeyUp(event: KeyboardEvent): void {
     this.keys.delete(event.key);
     this.keyStates.set(event.key, false);
     this.processInput();
   }
 
-  /**
-   * Handle mouse click events.
-   * @param {MouseEvent} event - The mouse event.
-   */
   private handleMouseClick(event: MouseEvent): void {
     // Handle mouse click events
   }
 
-  /**
-   * Process the current input state.
-   */
   private processInput(): void {
+    const currentTime = Date.now();
+
     let isMoving = false;
     for (let key of this.keys) {
       switch (this.controlSchema[key]) {
@@ -87,10 +66,16 @@ export class InputHandler {
           break;
 
         case "Attack":
-          this.character.move("Attack");
+          // Implement cooldown mechanism
+          if (currentTime - this.attackCooldown > 500) {
+            this.character.move("Attack");
+            this.attackCooldown = currentTime;
+          }
           break;
 
         case "ThrowWeapon":
+          console.log("input handler throw weapon");
+
           this.character.move("ThrowWeapon");
           break;
 

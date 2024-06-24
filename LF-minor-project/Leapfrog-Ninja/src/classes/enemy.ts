@@ -1,4 +1,9 @@
-import { AttackType, Character, Position, Size } from "../interfaces/interface";
+import {
+  AttackType,
+  ICharacter,
+  Position,
+  Size,
+} from "../interfaces/interface";
 import { getEnemySprite } from "../utils/getEnemySprite";
 import Level_1_Sublevel_1_Enemy_Attack from "../assets/Images/enemy/enemyAttacking.png";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
@@ -31,7 +36,7 @@ interface AnimationSettings {
 /**
  * Class representing a base enemy.
  */
-export class BaseEnemy implements Character {
+export class BaseEnemy implements ICharacter {
   position: Position;
   damageLevel: number;
   size: Size;
@@ -87,8 +92,7 @@ export class BaseEnemy implements Character {
     this.size = size;
     this.initialY = position.y;
     this.velocity = velocity;
-    this.enemyHead = new Image();
-    this.enemyHead.src = imageHeadSrc;
+
     this.health = health;
     this.maxHealth = 10;
     this.power = power;
@@ -97,6 +101,8 @@ export class BaseEnemy implements Character {
 
     this.image = new Image();
     this.image.src = imageSrc;
+    this.enemyHead = new Image();
+    this.enemyHead.src = imageHeadSrc;
 
     this.isJumping = false;
     this.isAttacking = false;
@@ -343,34 +349,34 @@ export class BaseEnemy implements Character {
     }
 
     if (this.animationState == AnimationState.Run) {
-      this.image.src = getEnemySprite(this.type, "Run");
+      this.image = getEnemySprite(this.type, "Run");
       this.position.x += this.velocity.x;
     }
 
     if (this.animationState == AnimationState.Idle) {
       this.isAttacking = false;
-      this.image.src = getEnemySprite(this.type, "Idle");
+      this.image = getEnemySprite(this.type, "Idle");
     }
 
     if (this.animationState == AnimationState.Attack) {
       this.isAttacking = true;
-      this.image.src = getEnemySprite(this.type, "Attack");
+      this.image = getEnemySprite(this.type, "Attack");
     }
 
     if (this.animationState == AnimationState.moveUp) {
-      this.image.src = getEnemySprite(this.type, "moveUp");
+      this.image = getEnemySprite(this.type, "moveUp");
       this.position.y += this.velocity.y;
     }
 
     if (this.animationState == AnimationState.ThrowWeapon) {
       this.isAttacking = true;
-      this.image.src = getEnemySprite(this.type, "ThrowWeapon")!;
+      this.image = getEnemySprite(this.type, "ThrowWeapon")!;
       this.position.y += this.velocity.y;
     }
 
     if (this.animationState == AnimationState.Dead) {
       this.isAttacking = false;
-      this.image.src = getEnemySprite(this.type, "Dead");
+      this.image = getEnemySprite(this.type, "Dead");
     }
   }
 

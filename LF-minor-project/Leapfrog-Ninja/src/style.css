@@ -5,6 +5,7 @@ body {
   margin: 0;
   padding: 0;
   background: #1b1836;
+  font-family: "Press Start 2P", system-ui;
   /*     background: green; */
 }
 canvas {
@@ -16,10 +17,10 @@ canvas {
 
 .gameContainer {
   position: relative;
-  width: 700px;
-  height: 450px;
+  width: 950px;
+  height: 800;
   margin: 0 auto;
-  top: 100px;
+  top: 350px;
 }
 
 .playGame,
@@ -28,7 +29,12 @@ canvas {
 .playAgain,
 .chooseCharacter,
 .viewEnemies,
-.ok {
+.ninjaBoyCharacter,
+.ninjaGirlCharacter,
+.difficulty,
+.mode,
+.ok,
+.sound {
   position: absolute;
   width: 150px;
   border-radius: 3px;
@@ -42,6 +48,62 @@ canvas {
   text-align: center;
 }
 
+.difficulty {
+  width: 129px;
+  top: 444px;
+  left: 207px;
+  display: none;
+}
+
+.mode {
+  width: 129px;
+  top: 444px;
+  left: 343px;
+  display: none;
+}
+.sound {
+  width: 129px;
+  top: 444px;
+  left: 480px;
+  display: none;
+}
+
+.modeSelector,
+.gameModeSelector,
+.soundSelector {
+  position: absolute;
+  top: 100px;
+  left: 70px;
+  width: 80%;
+  display: none;
+}
+
+input {
+  height: 30px;
+  width: 20px;
+  cursor: pointer;
+}
+label {
+  font-size: 30px;
+  color: white;
+}
+
+.modeSelector div {
+  margin-bottom: 10px;
+}
+
+.ninjaBoyCharacter {
+  width: 216px;
+  top: 497px;
+  left: 200px;
+  display: none;
+}
+.ninjaGirlCharacter {
+  width: 216px;
+  top: 497px;
+  left: 429px;
+  display: none;
+}
 .ok {
   width: 50px;
   top: 315px;
@@ -49,13 +111,13 @@ canvas {
   display: none;
 }
 .playGame {
-  top: 300px;
+  top: 400px;
   left: 120px;
   display: none;
 }
 .chooseCharacter {
   left: 275px;
-  top: 300px;
+  top: 400px;
   display: none;
 }
 .gameInstruction {
@@ -63,8 +125,9 @@ canvas {
   top: 300px;
   display: none;
 }
+
 .viewEnemies {
-  top: 300px;
+  top: 400px;
   left: 430px;
   display: none;
 }
@@ -79,12 +142,18 @@ canvas {
   left: 250px;
   display: none;
 }
+
 .playGame:hover,
 .gameInstruction:hover,
 .levelCompleted:hover,
 .playAgain:hover,
 .chooseCharacter:hover,
 .viewEnemies:hover,
+.ninjaBoyCharacter:hover,
+.ninjaGirlCharacter:hover,
+.difficulty:hover,
+.mode:hover,
+.sound:hover,
 .ok:hover {
   color: #ca440d;
   cursor: pointer;

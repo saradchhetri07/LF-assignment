@@ -1,6 +1,7 @@
 import level1background1 from "../assets/Images/background/platBackground-CH1.png";
 
 import level2background1 from "../assets/Images/background/platBackground-CH3.png";
+import level3background1 from "../assets/Images/background/bossBackgrounds.png";
 
 export const makeLevelImages = () => {
   const levelImages: { [key: string]: HTMLImageElement[] } = {
@@ -13,7 +14,7 @@ export const makeLevelImages = () => {
   const backgrounds: { [key: string]: string[] } = {
     level1: [level1background1, level1background1],
     level2: [level2background1, level1background1],
-    level3: [level1background1, level1background1],
+    level3: [level3background1, level3background1],
     level4: [level1background1, level1background1],
   };
 

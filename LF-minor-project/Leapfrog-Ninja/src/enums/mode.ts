@@ -1,4 +1,4 @@
-export enum Mode {
+export enum GameMode {
   Computer,
   Multiplayer,
 }

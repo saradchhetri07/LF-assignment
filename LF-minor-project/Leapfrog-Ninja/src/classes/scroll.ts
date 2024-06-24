@@ -26,7 +26,7 @@ export class Scroll implements Drawable {
 
   constructor(x: number, y: number, level: number) {
     this.position = { x, y };
-    this.size = { width: 80, height: 80 };
+    this.size = { width: 50, height: 50 };
     this.image = new Image();
     this.image.src = scrollImage;
     this.Level = level;
@@ -40,8 +40,6 @@ export class Scroll implements Drawable {
   makeScroll(platforms: Platform[]): void {
     const scrolls: Scroll[] = [];
     for (let i = 0; i < platforms.length; i++) {
-      console.log("inside makeScroll");
-
       const platformLevel = platforms[i].level;
       if (this.Level == platformLevel && (i + 1) % 2 == 0) {
         const scroll = new Scroll(platforms[i].x, platforms[i].y, this.Level);
@@ -54,27 +52,25 @@ export class Scroll implements Drawable {
   //placing the scrolls as per level
   display(context: CanvasRenderingContext2D): void {
     this.localScroll.forEach((scroll) => {
-      console.log("came to draw scroll");
-
       context.drawImage(
         this.image,
         scroll.position.x,
-        scroll.position.y - scroll.size.height,
+        scroll.position.y - scroll.size.height - 40,
+        this.size.width,
+        this.size.height
+      );
+
+      // Set the stroke style to red
+      context.strokeStyle = "red";
+
+      // Draw the rectangle around the player's image
+      context.strokeRect(
+        scroll.position.x,
+        scroll.position.y - scroll.size.height - 40,
         this.size.width,
         this.size.height
       );
     });
-
-    // Set the stroke style to red
-    context.strokeStyle = "red";
-
-    // Draw the rectangle around the player's image
-    context.strokeRect(
-      this.position.x,
-      this.position.y - this.size.height,
-      this.size.width,
-      this.size.height
-    );
   }
 
   clearScroll(): void {

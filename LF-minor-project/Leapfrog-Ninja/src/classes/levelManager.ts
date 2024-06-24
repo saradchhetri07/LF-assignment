@@ -20,7 +20,7 @@ import { Obstacle } from "./obstacle";
  * Class representing the level manager.
  */
 export class LevelManager {
-  private currentLevel: number;
+  private currentLevel: number = 1;
   private levels: Level[];
   private enemies: BaseEnemy[][];
   // private levelItems: Item[];
@@ -57,6 +57,7 @@ export class LevelManager {
     //   console.log("level is", level);
     // });
   }
+
   /**
    * Load the current level.
    * @returns {Level} - The current level.

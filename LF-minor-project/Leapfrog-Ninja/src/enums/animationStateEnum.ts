@@ -3,7 +3,6 @@ export enum AnimationState {
   Run,
   Attack,
   ThrowWeapon,
-  Poke,
   Dead,
   moveUp,
 }

@@ -4,23 +4,24 @@ import {
   NINJA_CONSTANT,
   NINJA_SPRITE_IDLE,
 } from "./../constants/constants";
-import ninjaMaleCharacter from "../assets/Images/gameplay/maleCharacter.png";
 import { Player } from "./player";
 import { BaseEnemy } from "./enemy";
 import { HUD } from "./hud";
 import { InputHandler } from "./inputHandler";
 import { LevelManager } from "./levelManager";
 
-import playerRunImage from "../assets/Images/player/ninjaBoyRunning.png";
 import { checkCollisions } from "../utils/collisionDetection";
 import { AnimationState } from "../enums/animationStateEnum";
-import { Assets } from "../utils/audioLoad";
 import { drawPauseScreen } from "../utils/pauseScreen";
 import { Drawable, Platform } from "../interfaces/interface";
 import { levelCompleted } from "../utils/levelCompleted";
 import { Scroll } from "./scroll";
-import { Mode } from "../enums/mode";
 import { HealthPotion } from "./healthPotion";
+import { GameMode } from "../enums/mode";
+import { Character } from "../enums/character";
+import { GameDifficulty } from "../enums/difficulty";
+import { assetsManager } from "./AssetsManager";
+import { SoundMode } from "../enums/sound";
 
 /**
  * Class representing the main game.
@@ -35,29 +36,34 @@ export class Game implements Drawable {
   private levelManager: LevelManager;
   private lastTime: number;
   private canvas: HTMLCanvasElement;
+  private chosenCharacter: Character = Character.Male;
+  private difficultyMode: GameDifficulty = GameDifficulty.Easy;
   private context: CanvasRenderingContext2D;
   isPaused: boolean = false; // Initialize isPaused to false
-
+  private soundModeStatus: SoundMode = SoundMode.ON;
   private kunai: Kunai[] = [];
   private kunaiClass?: Kunai;
 
   private hasKunaiLeft: boolean = false;
   private animationFrameId: number | null;
 
-  private mode: Mode; // Add mode property
+  private mode: GameMode; // Add mode property
 
   private scroll?: Scroll;
   private healthPotion?: HealthPotion;
 
   private ninjaPlatforms: Platform[] = [
-    // this.context.strokeRect(520, 320, 75, 12);
-    { x: 150, y: 300, width: 160, height: 12, level: 1, forPlacingKunai: true },
-    { x: 520, y: 320, width: 75, height: 12, level: 1, forPlacingKunai: false },
+    // this.context.strokeRect(200, 300, 200, 12);
+    // this.context.strokeRect(650, 320, 75, 12);
+
+    { x: 200, y: 300, width: 200, height: 12, level: 1, forPlacingKunai: true },
+
+    { x: 650, y: 320, width: 80, height: 12, level: 1, forPlacingKunai: false },
 
     {
-      x: 190,
+      x: 250,
       y: 368,
-      width: 150,
+      width: 230,
       height: 18,
       level: 2,
       forPlacingKunai: true,
@@ -77,8 +83,16 @@ export class Game implements Drawable {
       y: 275,
       width: 173,
       height: 12,
-      level: 2,
+      level: 3,
       forPlacingKunai: false,
+    },
+    {
+      x: 160,
+      y: 275,
+      width: 173,
+      height: 12,
+      level: 3,
+      forPlacingKunai: true,
     },
   ];
 
@@ -91,10 +105,21 @@ export class Game implements Drawable {
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-    mode: Mode
+
+    //player with computer or multiplayer
+    mode: GameMode,
+
+    chosenCharacter: Character,
+    //game difficulty mode
+    difficultyMode: GameDifficulty,
+    soundModeStatus: SoundMode
   ) {
     this.canvas = canvas;
     this.context = context;
+    this.mode = mode;
+
+    this.chosenCharacter = chosenCharacter;
+    this.difficultyMode = difficultyMode;
     this.mode = mode;
 
     this.levelManager = new LevelManager();
@@ -115,10 +140,14 @@ export class Game implements Drawable {
         width: NINJA_SPRITE_IDLE.WIDTH / NINJA_SPRITE_IDLE.COLUMN,
         height: NINJA_SPRITE_IDLE.HEIGHT / NINJA_SPRITE_IDLE.ROWS,
       },
-      playerRunImage,
+      chosenCharacter == Character.Male
+        ? assetsManager.sprites.NINJABOYJUMPING
+        : assetsManager.sprites.NINJAGIRLJUMPING,
       NINJA_SPRITE_IDLE.MAX_FRAME,
       100,
-      currentLevel.getCurrentLevel()
+      currentLevel.getCurrentLevel(),
+      this.chosenCharacter,
+      this.soundModeStatus
     );
 
     this.enemy = currentLevel.getCurrentEnemy();
@@ -157,11 +186,14 @@ export class Game implements Drawable {
 
   private makeHealthPotion(): void {
     const healthPotion = new HealthPotion(0, 0, 1);
-    healthPotion.makeHealthPotion(this.ninjaPlatforms);
+    healthPotion.makeHealthPotion(
+      this.ninjaPlatforms,
+      this.player.size.height,
+      this.player.initialY
+    );
   }
 
   makeScroll(): void {
-    console.log("making scroll");
     this.scroll = new Scroll(0, 0, 1);
     this.scroll?.makeScroll(this.ninjaPlatforms);
   }
@@ -217,6 +249,13 @@ export class Game implements Drawable {
    * Start the game loop.
    */
   start(): void {
+    const backgroundMusic = assetsManager.audios.BACKGROUND;
+    if (this.soundModeStatus == SoundMode.ON) {
+      backgroundMusic.loop = true;
+      backgroundMusic.volume = 0.2;
+      backgroundMusic.play();
+    }
+
     this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
   }
 
@@ -244,11 +283,11 @@ export class Game implements Drawable {
     this.context.lineWidth = 2;
 
     if (this.levelManager.getCurrentLevel() == 1) {
-      this.context.strokeRect(150, 300, 160, 12);
-      this.context.strokeRect(520, 320, 75, 12);
+      this.context.strokeRect(200, 300, 200, 12);
+      this.context.strokeRect(650, 320, 80, 12);
     }
     if (this.levelManager.getCurrentLevel() == 2) {
-      this.context.strokeRect(190, 368, 200, 18);
+      this.context.strokeRect(250, 368, 230, 18);
     }
   }
 
@@ -321,7 +360,7 @@ export class Game implements Drawable {
     this.scrollIsPicked();
 
     //bot movement
-    if (this.mode == Mode.Computer) {
+    if (this.mode == GameMode.Computer) {
       this.enemy.automateBehavior(this.player);
     }
 
@@ -333,14 +372,21 @@ export class Game implements Drawable {
     this.drawPlatforms();
     this.kunaiClass?.placeKunai(this.context);
 
+    //check collison and attack status
     this.handleCollisions();
+
+    //update kuanis when thrown by player
     this.updateKunais(deltaTime);
+
+    //draw HUD at top
     this.hud.draw(this.context);
 
+    //scroll display at the top of platform
     this.scroll?.display(this.context);
 
-    //make draw healthPotion
+    //display health potion
     this.healthPotion?.display(this.context);
+
     this.isHealthPotionPickedUp();
   }
 
@@ -350,6 +396,9 @@ export class Game implements Drawable {
       //check if he is picking the kunais
       this.kunaiClass?.kunaisOnPlatform.forEach((kunai, i) => {
         if (checkCollisions(this.player, kunai)) {
+          if (this.soundModeStatus == SoundMode.ON) {
+            assetsManager.audios.PICKUPKUNAI.play();
+          }
           this.player.kunaiCount++;
           this.kunaiClass?.kunaisOnPlatform.splice(i, 1);
         }
@@ -367,16 +416,18 @@ export class Game implements Drawable {
   }
 
   private scrollIsPicked(): void {
-    if (this.player.isOnPlatform) {
-      //check if he is picking the kunais
-      this.scroll?.localScroll.forEach((kunai, i) => {
-        if (checkCollisions(this.player, kunai)) {
-          this.scroll?.localScroll.splice(i, 1);
-          this.player.increaseScrollCount();
-          this.player.isScrollCollected = true;
+    //check if he is picking the kunais
+    this.scroll?.localScroll.forEach((scroll, i) => {
+      if (checkCollisions(this.player, scroll)) {
+        if (this.soundModeStatus == SoundMode.ON) {
+          const scrollPickSound = assetsManager.audios.SCROLLGRAB;
+          scrollPickSound.play();
         }
-      });
-    }
+        this.scroll?.localScroll.splice(i, 1);
+        this.player.increaseScrollCount();
+        this.player.isScrollCollected = true;
+      }
+    });
   }
 
   /**
@@ -400,6 +451,7 @@ export class Game implements Drawable {
   /**
    * Update and draw each kunai weapon.
    * @param {number} deltaTime - The time elapsed since the last update.
+   * logic form throwing kunais at the enemy
    */
   private updateKunais(deltaTime: number): void {
     if (
