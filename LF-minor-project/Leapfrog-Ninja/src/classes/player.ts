@@ -1,3 +1,4 @@
+import { HealthPotion } from "./healthPotion";
 import { assetsManager } from "./AssetsManager";
 import {
   ICharacter,
@@ -56,6 +57,7 @@ export class Player implements ICharacter {
   soundStatus: SoundMode = SoundMode.ON;
   frameBuffer: number = 10;
   elapsedFrame: number = 0;
+  potionCount: number = 0;
 
   private scrollCount: number = 0;
   isScrollCollected: boolean = false;
@@ -264,6 +266,18 @@ export class Player implements ICharacter {
         this.animationState = AnimationState.ThrowWeapon;
         break;
 
+      case "useHealthPotion":
+        if (this.health == 100) return;
+
+        if (this.soundStatus == SoundMode.ON) {
+          const drinkPotion = assetsManager.audios.DRINKPOTION;
+          drinkPotion.play();
+        }
+        this.decreaseHealthPotion();
+        this.health = 100;
+
+        break;
+
       default:
         console.log("key up");
         break;
@@ -310,6 +324,19 @@ export class Player implements ICharacter {
     this.kunaiCount++;
   }
 
+  //decrease health potion
+  decreaseHealthPotion(): void {
+    this.potionCount--;
+  }
+
+  increasePotionCount(): void {
+    this.potionCount++;
+  }
+
+  getPotionCount(): number {
+    return this.potionCount;
+  }
+
   //function to decrease the player health when hit by opponent
   decreaseHealth(damage: number): void {
     this.health -= damage;
@@ -340,7 +367,6 @@ export class Player implements ICharacter {
         this.isJumping = false;
         this.isOnGround = false;
         this.isOnPlatform = true;
-        console.log("is on platform?", this.isOnPlatform);
       }
     }
   }
@@ -417,8 +443,6 @@ export class Player implements ICharacter {
     }
 
     if (this.animationState == AnimationState.ThrowWeapon) {
-      console.log("player state throw weapon");
-
       this.image = this.isBoy
         ? assetsManager.sprites.NINJABOYTHROWING
         : assetsManager.sprites.NINJAGIRLTHROWING;

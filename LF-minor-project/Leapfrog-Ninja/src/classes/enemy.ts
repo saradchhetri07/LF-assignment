@@ -1,13 +1,10 @@
-import {
-  AttackType,
-  ICharacter,
-  Position,
-  Size,
-} from "../interfaces/interface";
+import { Size } from "./../interfaces/interface";
+import { AttackType, ICharacter, Position } from "../interfaces/interface";
 import { getEnemySprite } from "../utils/getEnemySprite";
 import Level_1_Sublevel_1_Enemy_Attack from "../assets/Images/enemy/enemyAttacking.png";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 import { Player } from "./player";
+import { assetsManager } from "./AssetsManager";
 
 /**
  * Enum representing the different animation states.
@@ -57,10 +54,14 @@ export class BaseEnemy implements ICharacter {
   isTurningLeft: boolean = false;
   isTurningRight: boolean = false;
   type: string;
+  isOnGround: boolean = true;
   jumpHeight: number = 300;
   gravity: number = 9.8;
   isDead = false;
+
   enemyHead: HTMLImageElement;
+
+  private throwWeaponTimer: number | null = null;
 
   private verticalFrameTimer: number | null;
   private animationSettings: { [key in AnimationState]: AnimationSettings };
@@ -111,6 +112,7 @@ export class BaseEnemy implements ICharacter {
     this.animationFrameRate = 10; // Adjust based on your needs
     this.animationFrameCount = 0;
     this.verticalFrameTimer = null;
+    // this.startThrowWeaponTimer();
 
     this.frameX = 0;
     this.frameY = 0;
@@ -169,6 +171,20 @@ export class BaseEnemy implements ICharacter {
   }
 
   /**
+   * Start the timer to change the animation state to ThrowWeapon after 10 seconds.
+   */
+  // private startThrowWeaponTimer(): void {
+  //   if (this.throwWeaponTimer) {
+  //     clearTimeout(this.throwWeaponTimer);
+  //   }
+
+  //   this.throwWeaponTimer = window.setTimeout(() => {
+  //     this.animationState = AnimationState.ThrowWeapon;
+  //     this.updateAnimation();
+  //   }, 10000); // 10 seconds
+  // }
+
+  /**
    * Move the enemy in the specified direction.
    * @param {string} direction - The direction to move the enemy.
    */
@@ -177,21 +193,28 @@ export class BaseEnemy implements ICharacter {
       case "idle":
         this.setIdleState();
         break;
+
       case "moveLeft":
         this.moveLeft();
         break;
+
       case "moveRight":
         this.moveRight();
         break;
+
       case "moveUp":
         this.jump();
         break;
+
       case "Attack":
         this.attack();
         break;
+
       case "ThrowWeapon":
+        console.log("move throw weapon");
         this.throwWeapon();
         break;
+
       default:
         console.log("Invalid direction");
         break;
@@ -203,18 +226,14 @@ export class BaseEnemy implements ICharacter {
    */
   private setIdleState(): void {
     this.animationState = AnimationState.Idle;
-    this.isJumping = false;
-    this.updateAnimation();
   }
 
   /**
    * Move the enemy to the left.
    */
   private moveLeft(): void {
-    if (this.isJumping) return;
     this.isTurningLeft = true;
     this.isTurningRight = false;
-    this.velocity.x = -8;
     this.frameX = 1;
     this.animationState = AnimationState.Run;
     this.updateAnimation();
@@ -226,7 +245,6 @@ export class BaseEnemy implements ICharacter {
   private moveRight(): void {
     this.isTurningLeft = false;
     this.isTurningRight = true;
-    this.velocity.x = 8;
     this.frameX = 0;
     this.animationState = AnimationState.Run;
     this.updateAnimation();
@@ -237,10 +255,11 @@ export class BaseEnemy implements ICharacter {
    */
   private jump(): void {
     if (!this.isJumping) {
-      this.velocity.y = -10;
       this.isJumping = true;
       this.animationState = AnimationState.moveUp;
+      this.isOnGround = false;
       this.updateAnimation();
+      console.log("jumping variable changed", this.isJumping);
     }
   }
 
@@ -258,15 +277,8 @@ export class BaseEnemy implements ICharacter {
    */
   private throwWeapon(): void {
     this.animationState = AnimationState.ThrowWeapon;
-    this.isAttacking = true;
+    console.log("throw weapon animation state changed");
     this.updateAnimation();
-  }
-
-  /**
-   * Handle collisions with other objects.
-   */
-  handleCollision(): void {
-    // Implement collision handling logic here
   }
 
   /**
@@ -337,41 +349,85 @@ export class BaseEnemy implements ICharacter {
    * @param {number} deltaTime - The time elapsed since the last update.
    */
   private updatePosition(deltaTime: number): void {
-    if (this.isJumping) {
-      this.position.y += (this.velocity.y * deltaTime) / 16.67;
-      if (this.position.y <= this.initialY - this.jumpHeight) {
-        this.velocity.y = this.gravity;
-      }
+    if (this.health <= 0) {
+      this.animationState = AnimationState.Dead;
+    }
+    //if player is on the ground change some boolean values
+    if (this.position.y >= this.initialY) {
+      this.isOnGround = true;
+    }
+
+    // //ifplayer reaches max height
+    if (this.position.y <= this.jumpHeight) {
+      this.velocity.y = -this.gravity;
+      this.isJumping = false;
+    }
+
+    // if (this.isJumping) {
+    //   this.position.y += (this.velocity.y * deltaTime) / 16.67;
+    //   if (this.position.y <= this.initialY - this.jumpHeight) {
+    //     this.velocity.y = this.gravity;
+    //   }
+    // }
+    console.log("current animation state is", this.animationState);
+
+    // if (!this.isJumping && this.position.y < this.initialY) {
+    //   this.position.y += (this.gravity * deltaTime) / 16.67;
+    // }
+
+    //dont let player go out of  ground position
+    if (this.position.y > this.initialY) {
+      this.position.y = this.initialY;
     }
 
     if (!this.isJumping && this.position.y < this.initialY) {
-      this.position.y += this.gravity;
+      this.position.y += (this.gravity * deltaTime) / 16.67;
     }
 
-    if (this.animationState == AnimationState.Run) {
+    if (this.animationState == AnimationState.Run && this.isTurningRight) {
       this.image = getEnemySprite(this.type, "Run");
-      this.position.x += this.velocity.x;
+      this.position.x += (this.velocity.x * deltaTime) / 25;
+    }
+
+    if (this.animationState == AnimationState.Run && !this.isTurningRight) {
+      this.image = getEnemySprite(this.type, "Run");
+      this.position.x -= (this.velocity.x * deltaTime) / 25;
     }
 
     if (this.animationState == AnimationState.Idle) {
+      if (assetsManager.getSoundStatus() && this.type == "level_2_Sublevel_1") {
+        const orkSound = assetsManager.audios.ORKSOUND;
+        orkSound.play();
+      }
       this.isAttacking = false;
+      this.isJumping = false;
       this.image = getEnemySprite(this.type, "Idle");
     }
 
     if (this.animationState == AnimationState.Attack) {
+      if (assetsManager.getSoundStatus() && this.type == "level_2_Sublevel_1") {
+        const orkSound = assetsManager.audios.ORKGROAN;
+        orkSound.play();
+      }
       this.isAttacking = true;
       this.image = getEnemySprite(this.type, "Attack");
     }
 
     if (this.animationState == AnimationState.moveUp) {
       this.image = getEnemySprite(this.type, "moveUp");
-      this.position.y += this.velocity.y;
+      this.position.y += (8 * deltaTime) / 16.67;
     }
 
-    if (this.animationState == AnimationState.ThrowWeapon) {
-      this.isAttacking = true;
+    if (
+      this.animationState == AnimationState.ThrowWeapon &&
+      this.type == "level_2_Sublevel_1"
+    ) {
+      if (assetsManager.getSoundStatus()) {
+        const orkSound = assetsManager.audios.THROW;
+        orkSound.play();
+      }
       this.image = getEnemySprite(this.type, "ThrowWeapon")!;
-      this.position.y += this.velocity.y;
+      console.log("inside update to change the throw state");
     }
 
     if (this.animationState == AnimationState.Dead) {
@@ -383,6 +439,7 @@ export class BaseEnemy implements ICharacter {
   /**
    * Handle collisions with the canvas boundaries.
    */
+
   private handleBoundaryCollisions(): void {
     if (this.position.x + this.size.width >= CANVAS_DIMENSIONS.CANVAS_WIDTH) {
       this.position.x = CANVAS_DIMENSIONS.CANVAS_WIDTH - this.size.width;
@@ -403,7 +460,7 @@ export class BaseEnemy implements ICharacter {
   automateBehavior(player: Player): void {
     // Calculate the distance between the enemy and the player
     const distanceToPlayer =
-      player.position.x - this.position.x + player.size.width / 2;
+      player.position.x - this.position.x + player.size.width;
 
     // Move towards the player if not close enough to attack
     if (Math.abs(distanceToPlayer) > this.size.width) {
@@ -431,11 +488,63 @@ export class BaseEnemy implements ICharacter {
         : animationFrameRate;
 
     if (this.animationState == AnimationState.Attack) {
-      this.handleVerticalAnimation(currentAnimationFrameRate);
+      this.handleVerticalAnimation();
     } else if (this.animationState == AnimationState.Dead) {
-      this.handleDeadAnimation(currentAnimationFrameRate);
+      this.handleDeadAnimation();
     } else {
       this.handleRegularAnimation(currentAnimationFrameRate);
+    }
+  }
+
+  // //disappearing enemy
+  // disappearEnemy(ctx: CanvasRenderingContext2D): void {
+  //   if (this.type == "level_2_Sublevel_1") {
+  //     //making the aura for enemy to disappear
+  //     // ctx.drawImage(
+  //     //   assetsManager.sprites.AURA,
+  //     //   this.position.x,
+  //     //   this.position.y + this.size.height,
+  //     //   this.size.width,
+  //     //   this.size.height * 0.2
+  //     // );
+
+  //     // Set a timeout to clear the enemy after 3 seconds
+  //     setTimeout(() => {
+  //       ctx.clearRect(
+  //         this.position.x,
+  //         this.position.y,
+  //         this.size.width,
+  //         this.size.height
+  //       );
+  //     }, 3000);
+  //   }
+  // }
+
+  //reappear enemy with added health
+  reappearEnemy(ctx: CanvasRenderingContext2D): void {
+    if (this.type == "level_2_Sublevel_1") {
+      // Set a timeout to clear the enemy after 3 seconds
+      setTimeout(() => {
+        ctx.drawImage(
+          assetsManager.sprites.AURA,
+          this.position.x,
+          this.position.y + this.size.height,
+          this.size.width,
+          this.size.height * 0.2
+        );
+        ctx.drawImage(
+          this.image,
+          this.position.x,
+          this.position.y + this.size.height
+        );
+      }, 3000);
+
+      ctx.clearRect(
+        this.position.x,
+        this.position.y,
+        this.size.width,
+        this.size.height * 0.2
+      );
     }
   }
 
@@ -443,25 +552,18 @@ export class BaseEnemy implements ICharacter {
    * Handle the animation for vertical movements.
    * @param {number} frameRate - The frame rate for the animation.
    */
-  private handleVerticalAnimation(frameRate: number): void {
-    if (!this.verticalFrameTimer) {
-      this.verticalFrameTimer = setTimeout(() => {
-        this.frameY =
-          (this.frameY + 1) % this.animationSettings[this.animationState].rows;
-        this.verticalFrameTimer = null; // Reset timer after the frame update
-      }, 1000 / frameRate); // Delay for the vertical frames
-    }
+  private handleVerticalAnimation(): void {
+    this.frameY =
+      (this.frameY + 1) % this.animationSettings[this.animationState].rows;
   }
 
   /**
    * Handle the animation for the dead state.
    * @param {number} frameRate - The frame rate for the animation.
    */
-  private handleDeadAnimation(frameRate: number): void {
-    if (this.animationFrameCount++ >= frameRate) {
-      this.animationFrameCount = 0;
-      this.frameY = this.frameY + 1;
-    }
+  private handleDeadAnimation(): void {
+    this.frameY =
+      (this.frameY + 1) % this.animationSettings[this.animationState].rows;
   }
 
   /**
@@ -469,8 +571,8 @@ export class BaseEnemy implements ICharacter {
    * @param {number} frameRate - The frame rate for the animation.
    */
   private handleRegularAnimation(frameRate: number): void {
+    this.animationFrameCount = 0;
     if (this.animationFrameCount++ >= frameRate) {
-      this.animationFrameCount = 0;
       this.frameY =
         (this.frameY + 1) % this.animationSettings[this.animationState].rows;
     }

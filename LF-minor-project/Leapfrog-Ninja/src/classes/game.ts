@@ -22,6 +22,7 @@ import { Character } from "../enums/character";
 import { GameDifficulty } from "../enums/difficulty";
 import { assetsManager } from "./AssetsManager";
 import { SoundMode } from "../enums/sound";
+import { Weapon } from "./Weapon";
 
 /**
  * Class representing the main game.
@@ -30,45 +31,36 @@ export class Game implements Drawable {
   private player: Player;
   private enemy: BaseEnemy; // Assuming one enemy
   private hud: HUD;
+  private damageFactor?: number; // factor of damage
   private inputHandler1: InputHandler;
   private inputHandler2: InputHandler;
   private animationId: number = 0;
   private levelManager: LevelManager;
   private lastTime: number;
+  private enemyWeaponLeft: boolean = false;
+
+  private timerCounter: number = 0;
+
   private canvas: HTMLCanvasElement;
+
   private chosenCharacter: Character = Character.Male;
   private difficultyMode: GameDifficulty = GameDifficulty.Easy;
+
   private context: CanvasRenderingContext2D;
   isPaused: boolean = false; // Initialize isPaused to false
   private soundModeStatus: SoundMode = SoundMode.ON;
   private kunai: Kunai[] = [];
   private kunaiClass?: Kunai;
-
-  private hasKunaiLeft: boolean = false;
+  private playerKunaiLeft: boolean = false;
   private animationFrameId: number | null;
-
   private mode: GameMode; // Add mode property
-
   private scroll?: Scroll;
+  private enemyWeapon?: Weapon[] = [];
   private healthPotion?: HealthPotion;
-
   private ninjaPlatforms: Platform[] = [
-    // this.context.strokeRect(200, 300, 200, 12);
-    // this.context.strokeRect(650, 320, 75, 12);
-
     { x: 200, y: 300, width: 200, height: 12, level: 1, forPlacingKunai: true },
-
     { x: 650, y: 320, width: 80, height: 12, level: 1, forPlacingKunai: false },
-
-    {
-      x: 250,
-      y: 368,
-      width: 230,
-      height: 18,
-      level: 2,
-      forPlacingKunai: true,
-    },
-
+    { x: 250, y: 368, width: 230, height: 18, level: 2, forPlacingKunai: true },
     {
       x: CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
       y: CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2,
@@ -77,7 +69,6 @@ export class Game implements Drawable {
       level: 2,
       forPlacingKunai: false,
     },
-
     {
       x: 160,
       y: 275,
@@ -86,41 +77,32 @@ export class Game implements Drawable {
       level: 3,
       forPlacingKunai: false,
     },
-    {
-      x: 160,
-      y: 275,
-      width: 173,
-      height: 12,
-      level: 3,
-      forPlacingKunai: true,
-    },
+    { x: 160, y: 275, width: 173, height: 12, level: 3, forPlacingKunai: true },
   ];
 
   /**
    * Create a new game.
    * @param {HTMLCanvasElement} canvas - The canvas element to draw the game on.
    * @param {CanvasRenderingContext2D} context - The drawing context.
-   * @param {Assets} assets - The loaded assets for the game.
+   * @param {GameMode} mode - The game mode.
+   * @param {Character} chosenCharacter - The chosen character.
+   * @param {GameDifficulty} difficultyMode - The difficulty mode.
+   * @param {SoundMode} soundModeStatus - The sound mode status.
    */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-
-    //player with computer or multiplayer
     mode: GameMode,
-
     chosenCharacter: Character,
-    //game difficulty mode
     difficultyMode: GameDifficulty,
     soundModeStatus: SoundMode
   ) {
     this.canvas = canvas;
     this.context = context;
     this.mode = mode;
-
     this.chosenCharacter = chosenCharacter;
     this.difficultyMode = difficultyMode;
-    this.mode = mode;
+    this.soundModeStatus = soundModeStatus;
 
     this.levelManager = new LevelManager();
     const currentLevel = this.levelManager.loadCurrentLevel();
@@ -178,12 +160,21 @@ export class Game implements Drawable {
       },
       this
     );
+
     this.makeKunaiOnPlatform();
+    this.makeHealthPotion();
     this.lastTime = 0;
     this.makeScroll();
-    this.makeHealthPotion();
+    this.initSound();
   }
 
+  private initSound() {
+    assetsManager.toggleSound(this.soundModeStatus);
+  }
+
+  /**
+   * Create health potions and place them on platforms.
+   */
   private makeHealthPotion(): void {
     const healthPotion = new HealthPotion(0, 0, 1);
     healthPotion.makeHealthPotion(
@@ -191,33 +182,37 @@ export class Game implements Drawable {
       this.player.size.height,
       this.player.initialY
     );
+    this.healthPotion = healthPotion;
   }
 
+  /**
+   * Create scrolls and place them on platforms.
+   */
   makeScroll(): void {
     this.scroll = new Scroll(0, 0, 1);
     this.scroll?.makeScroll(this.ninjaPlatforms);
   }
 
   /**
-   *
    * Initialize the current level.
    */
   reInitializeLevel(): void {
     const currentLevel = this.levelManager.loadCurrentLevel();
 
     this.enemy = currentLevel.getCurrentEnemy();
-
     this.hud = new HUD(this.player, this.enemy);
 
-    //clearing kunais of previous level and making it again for new level
+    // Clear previous level items and create new ones for the new level
     this.kunaiClass?.clearkunais();
     this.kunaiClass?.incrementKunaiLevel();
     this.kunaiClass?.makeKunai(this.ninjaPlatforms, 3);
 
-    //clearing scroll of previous level and making it again for new level
     this.scroll?.clearScroll();
     this.scroll?.incrementScrollLevel();
     this.scroll?.makeScroll(this.ninjaPlatforms);
+
+    this.healthPotion?.healthPotions.splice(0);
+    this.makeHealthPotion();
 
     this.inputHandler1 = new InputHandler(
       this.player,
@@ -228,6 +223,7 @@ export class Game implements Drawable {
         a: "Attack",
         s: "ThrowWeapon",
         p: "pause",
+        t: "useHealthPotion",
       },
       this
     );
@@ -249,6 +245,14 @@ export class Game implements Drawable {
    * Start the game loop.
    */
   start(): void {
+    if (this.difficultyMode == GameDifficulty.Easy) {
+      this.damageFactor = 2;
+    } else if (this.difficultyMode == GameDifficulty.Medium) {
+      this.damageFactor = 4;
+    } else {
+      this.damageFactor = 6;
+    }
+
     const backgroundMusic = assetsManager.audios.BACKGROUND;
     if (this.soundModeStatus == SoundMode.ON) {
       backgroundMusic.loop = true;
@@ -278,19 +282,30 @@ export class Game implements Drawable {
   /**
    * Draw all the platforms with a red border.
    */
+
   private drawPlatforms(): void {
     this.context.strokeStyle = "red";
     this.context.lineWidth = 2;
 
-    if (this.levelManager.getCurrentLevel() == 1) {
+    if (this.levelManager.getCurrentLevel() === 1) {
       this.context.strokeRect(200, 300, 200, 12);
       this.context.strokeRect(650, 320, 80, 12);
     }
-    if (this.levelManager.getCurrentLevel() == 2) {
+    if (this.levelManager.getCurrentLevel() === 2) {
+      this.context.fillStyle = "green";
       this.context.strokeRect(250, 368, 230, 18);
+      this.context.fillRect(
+        CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
+        CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2,
+        128,
+        20
+      );
     }
   }
 
+  /**
+   * Create kunai and place them on platforms.
+   */
   private makeKunaiOnPlatform() {
     // Instantiate kunaiClass
     this.kunaiClass = new Kunai(0, 0, 0, false, 1);
@@ -355,12 +370,16 @@ export class Game implements Drawable {
       }
     }
 
+    // if (this.enemy.health < 30 && this.enemy.type == "level_2_Sublevel_1") {
+    //   // this.enemy.disappearEnemy(this.context);
+    //   // this.enemy.reappearEnemy(this.context);
+    //   this.enemy.health = 100;
+    // }
     this.kunaiIsPicked();
-
     this.scrollIsPicked();
 
-    //bot movement
-    if (this.mode == GameMode.Computer) {
+    // bot movement
+    if (this.mode === GameMode.Computer) {
       this.enemy.automateBehavior(this.player);
     }
 
@@ -372,31 +391,35 @@ export class Game implements Drawable {
     this.drawPlatforms();
     this.kunaiClass?.placeKunai(this.context);
 
-    //check collison and attack status
+    // check collison and attack status
     this.handleCollisions();
 
-    //update kuanis when thrown by player
+    // update kunais when thrown by player
     this.updateKunais(deltaTime);
 
-    //draw HUD at top
+    //update enemy when enemy hits x
+    this.updateEnemyWeapon(deltaTime);
+
+    // draw HUD at top
     this.hud.draw(this.context);
 
-    //scroll display at the top of platform
+    // scroll display at the top of platform
     this.scroll?.display(this.context);
 
-    //display health potion
+    // display health potion
     this.healthPotion?.display(this.context);
 
     this.isHealthPotionPickedUp();
   }
 
-  //check if the player is on the platform so as to collect the kunais
+  /**
+   * Check if the player is on the platform to collect kunais.
+   */
   private kunaiIsPicked(): void {
     if (this.player.isOnPlatform) {
-      //check if he is picking the kunais
       this.kunaiClass?.kunaisOnPlatform.forEach((kunai, i) => {
         if (checkCollisions(this.player, kunai)) {
-          if (this.soundModeStatus == SoundMode.ON) {
+          if (this.soundModeStatus === SoundMode.ON) {
             assetsManager.audios.PICKUPKUNAI.play();
           }
           this.player.kunaiCount++;
@@ -406,20 +429,29 @@ export class Game implements Drawable {
     }
   }
 
+  /**
+   * Check if the player picks up a health potion.
+   */
   private isHealthPotionPickedUp(): void {
     this.healthPotion?.healthPotions.forEach((healthPotion, i) => {
       if (checkCollisions(this.player, healthPotion)) {
-        this.player.health = 100;
+        if (this.soundModeStatus == SoundMode.ON) {
+          const potionPickSound = assetsManager.audios.POTIONGRAB;
+          potionPickSound.play();
+          this.player.increasePotionCount();
+        }
         this.healthPotion?.healthPotions.splice(i, 1);
       }
     });
   }
 
+  /**
+   * Check if the player picks up a scroll.
+   */
   private scrollIsPicked(): void {
-    //check if he is picking the kunais
     this.scroll?.localScroll.forEach((scroll, i) => {
       if (checkCollisions(this.player, scroll)) {
-        if (this.soundModeStatus == SoundMode.ON) {
+        if (this.soundModeStatus === SoundMode.ON) {
           const scrollPickSound = assetsManager.audios.SCROLLGRAB;
           scrollPickSound.play();
         }
@@ -451,13 +483,12 @@ export class Game implements Drawable {
   /**
    * Update and draw each kunai weapon.
    * @param {number} deltaTime - The time elapsed since the last update.
-   * logic form throwing kunais at the enemy
    */
   private updateKunais(deltaTime: number): void {
     if (
-      this.player.animationState == AnimationState.ThrowWeapon &&
-      !this.hasKunaiLeft &&
-      this.player.kunaiCount > 0
+      this.player.animationState === AnimationState.ThrowWeapon &&
+      this.player.kunaiCount > 0 &&
+      !this.playerKunaiLeft
     ) {
       const newKunai = new Kunai(
         this.player.position.x +
@@ -469,27 +500,92 @@ export class Game implements Drawable {
       );
       this.kunai.push(newKunai);
       this.player.kunaiCount--;
-      this.hasKunaiLeft = true;
     }
 
     this.kunai.forEach((kunai, index) => {
-      kunai.update(deltaTime, this.player.isTurningRight);
+      kunai.update(deltaTime);
       kunai.display(this.context);
+      this.playerKunaiLeft = true;
+
+      if (checkCollisions(kunai, this.enemy)) {
+        // this.hasKunaiLeft = false;
+        this.enemy.hitEffect(this.player.isTurningLeft);
+        this.kunai.splice(index, 1);
+        this.enemy.decreaseHealth(kunai.damageLevel);
+        this.playerKunaiLeft = false;
+      }
 
       if (
         kunai.position.x < 0 ||
-        kunai.position.x > CANVAS_DIMENSIONS.CANVAS_WIDTH ||
-        checkCollisions(kunai, this.enemy)
+        kunai.position.y >= CANVAS_DIMENSIONS.CANVAS_WIDTH
       ) {
-        this.hasKunaiLeft = false;
-        this.enemy.hitEffect(this.player.isTurningLeft);
-        this.kunai.splice(index, 1);
+        this.playerKunaiLeft = false;
+      }
 
-        if (checkCollisions(kunai, this.enemy)) {
-          this.enemy.decreaseHealth(kunai.damageLevel);
-        }
+      if (this.distanceBetweenKunai(kunai)) {
+        this.playerKunaiLeft = false;
       }
     });
+  }
+
+  /**
+   * Update and draw each kunai weapon.
+   * @param {number} deltaTime - The time elapsed since the last update.
+   */
+
+  private updateEnemyWeapon(deltaTime: number): void {
+    if (
+      this.enemy.animationState === AnimationState.ThrowWeapon &&
+      !this.enemyWeaponLeft
+    ) {
+      console.log("enemy throwing weapon");
+
+      const weapon = new Weapon(
+        this.enemy.position.x +
+          (this.enemy.isTurningRight ? this.enemy.size.width / 2 : 0),
+        this.enemy.position.y + this.enemy.size.height / 2,
+        this.enemy.type,
+        this.levelManager.getCurrentLevel(),
+        this.enemy.isTurningRight
+      );
+
+      this.enemyWeapon?.push(weapon);
+    }
+
+    this.enemyWeapon?.forEach((weapon, index) => {
+      weapon.update(deltaTime);
+      weapon.display(this.context);
+      this.enemyWeaponLeft = true;
+
+      if (checkCollisions(weapon, this.player)) {
+        this.enemyWeapon?.splice(index, 1);
+        this.player.decreaseHealth(weapon.damageLevel);
+        this.enemyWeaponLeft = false;
+      }
+
+      if (
+        weapon.position.x < 0 ||
+        weapon.position.y >= CANVAS_DIMENSIONS.CANVAS_WIDTH
+      ) {
+        this.enemyWeaponLeft = false;
+      }
+
+      if (this.distanceBetweenWeapon(weapon)) {
+        this.enemyWeaponLeft = false;
+      }
+    });
+  }
+
+  private distanceBetweenWeapon(weapon: Weapon): boolean {
+    let threshhold = 100;
+    const dx = this.enemy.position.x - weapon.position.x;
+    return Math.abs(dx) > threshhold;
+  }
+
+  private distanceBetweenKunai(kunai: Kunai): boolean {
+    let threshhold = 250;
+    const dx = this.player.position.x - kunai.position.x;
+    return Math.abs(dx) > threshhold;
   }
 
   /**

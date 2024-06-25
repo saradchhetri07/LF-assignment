@@ -26,10 +26,6 @@ export interface Movable {
   move(direction: string): void;
 }
 
-export interface Collidable {
-  handleCollision(): void;
-}
-
 export interface Sound {
   audio: HTMLAudioElement;
   loop: boolean;
@@ -45,7 +41,7 @@ export interface Platform extends Position, Size {
   forPlacingKunai: boolean;
 }
 
-export interface ICharacter extends Drawable, Movable, Collidable {
+export interface ICharacter extends Drawable, Movable {
   position: Position;
   damageLevel: number;
   size: Size;

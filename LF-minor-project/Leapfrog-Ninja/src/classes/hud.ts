@@ -3,6 +3,8 @@ import { BaseEnemy } from "./enemy";
 import { Drawable, Updatable } from "../interfaces/interface";
 import { Player } from "./player";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
+import { HealthPotion } from "./healthPotion";
+import { assetsManager } from "./AssetsManager";
 
 /**
  * Class representing the Heads-Up Display (HUD).
@@ -40,46 +42,13 @@ export class HUD implements Drawable, Updatable {
    * Draw the HUD on the canvas.
    * @param {CanvasRenderingContext2D} context - The drawing context.
    */
+
   draw(context: CanvasRenderingContext2D): void {
-    context.font = "30px sans-serif";
-    context.fillStyle = "white";
-
-    // // Draw score
-    // context.fillText(`Score: ${this.score}`, 20, 30);
-    context.fillText(
-      `${this.player.getScrollCount()}`,
-      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 60,
-      90
-    );
-
-    context.drawImage(
-      this.scroll.image,
-      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 50,
-      100,
-      30,
-      60
-    );
-
-    // Draw time
-    context.fillText(
-      `${this.player.kunaiCount}`,
-      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 8,
-      90
-    );
-
-    context.drawImage(
-      this.player.kunaiImage,
-      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
-      100,
-      30,
-      60
-    );
-
-    // Draw player health bar
+    // Draw the player icon and health bar at the top
     context.drawImage(this.player.playerHead, 20, 20, 80, 80);
-
     this.drawHealthBar(context, 20, 110, 200, 20, this.player.health);
 
+    // Draw the enemy icon and health bar at the top
     context.drawImage(
       this.baseEnemy.enemyHead,
       CANVAS_DIMENSIONS.CANVAS_WIDTH - 80,
@@ -87,8 +56,6 @@ export class HUD implements Drawable, Updatable {
       80,
       80
     );
-
-    // Draw enemy health bar
     this.drawHealthBar(
       context,
       CANVAS_DIMENSIONS.CANVAS_WIDTH - 220,
@@ -96,6 +63,62 @@ export class HUD implements Drawable, Updatable {
       200,
       20,
       this.baseEnemy.health
+    );
+
+    // Set the background color for the HUD at the bottom
+    const hudHeight = 60;
+
+    context.fillStyle = "black";
+    context.fillRect(
+      0,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - hudHeight,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH,
+      hudHeight
+    );
+
+    context.font = "30px sans-serif";
+    context.fillStyle = "white";
+
+    // Potion count and image
+    context.fillText(
+      `${this.player.getPotionCount()}`,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 - 40,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 20
+    );
+    context.drawImage(
+      assetsManager.sprites.HEALTH_POTION,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 - 100,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 50,
+      40,
+      40
+    );
+
+    // Scroll count and image
+    context.fillText(
+      `${this.player.getScrollCount()}`,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 80,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 20
+    );
+    context.drawImage(
+      this.scroll.image,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 10,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 60,
+      60,
+      60
+    );
+
+    // Kunai count and image
+    context.fillText(
+      `${this.player.kunaiCount}`,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 160,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 20
+    );
+    context.drawImage(
+      this.player.kunaiImage,
+      CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 100,
+      CANVAS_DIMENSIONS.CANVAS_HEIGHT - 60,
+      30,
+      60
     );
   }
 

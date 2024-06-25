@@ -1,3 +1,4 @@
+import { Sound } from "./../interfaces/interface";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 
 import background from "../assets/sounds/backgroundMusic.ogg";
@@ -100,11 +101,13 @@ import kunaiIcon from "../assets/Images/player/kunaiIcon.png";
 import bossThrowable from "../assets/Images/enemy/bossThrowable.png";
 import orkThrowable from "../assets/Images/enemy/orkThrowable.png";
 import bombs from "../assets/Images/enemy/star.png";
+import { SoundMode } from "../enums/sound";
 
 class AssetsManager {
   private static instance: AssetsManager;
   public audios: { [key: string]: HTMLAudioElement } = {};
   public sprites: { [key: string]: HTMLImageElement } = {};
+  public isSoundOn: boolean = true;
   private assetsStillLoading: number = 0;
   private numAssets: number = 0;
   private loadedPercent: number = 0;
@@ -116,6 +119,19 @@ class AssetsManager {
       AssetsManager.instance = new AssetsManager();
     }
     return AssetsManager.instance;
+  }
+
+  public toggleSound(status: SoundMode) {
+    if (status === SoundMode.ON) {
+      this.isSoundOn = true;
+    } else {
+      this.isSoundOn = false;
+    }
+  }
+
+  // Add this method to get the current sound status
+  public getSoundStatus(): boolean {
+    return this.isSoundOn;
   }
 
   public loadAssets(callback: () => void): void {

@@ -1,15 +1,9 @@
-import {
-  Collidable,
-  Drawable,
-  Position,
-  Size,
-  Updatable,
-} from "../interfaces/interface";
+import { Drawable, Position, Size, Updatable } from "../interfaces/interface";
 
 /**
  * Class representing an obstacle.
  */
-export class Obstacle implements Drawable, Updatable, Collidable {
+export class Obstacle implements Drawable, Updatable {
   position: Position;
   size: Size;
   type: string;

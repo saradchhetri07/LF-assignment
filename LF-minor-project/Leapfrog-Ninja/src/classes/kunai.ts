@@ -117,7 +117,7 @@ export class Kunai implements Drawable {
     });
   }
 
-  update(deltaTime: number, isRight: boolean) {
+  update(deltaTime: number) {
     if (this.isRightDirection) {
       this.position.x += (this.velocity.x * deltaTime) / 16.67;
     } else {
