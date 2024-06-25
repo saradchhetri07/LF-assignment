@@ -1,21 +1,9 @@
-import { HealthPotion } from "./healthPotion";
 import { assetsManager } from "./AssetsManager";
-import {
-  ICharacter,
-  Position,
-  Size,
-  AttackType,
-  Platform,
-} from "../interfaces/interface";
+import { ICharacter, Position, Size, Platform } from "../interfaces/interface";
 
 import kunaiImage from "../assets/Images/player/kunaiDown.png";
 
-import {
-  CANVAS_DIMENSIONS,
-  KUNAI_CONSTANT,
-  NINJA_CONSTANT,
-  NINJA_SPRITE_RUNNING,
-} from "../constants/constants";
+import { CANVAS_DIMENSIONS, NINJA_CONSTANT } from "../constants/constants";
 import { Kunai } from "./kunai";
 import { Character } from "../enums/character";
 import { SoundMode } from "../enums/sound";
@@ -40,7 +28,6 @@ interface AnimationSettings {
 }
 
 export class Player implements ICharacter {
-  private chosenCharater: Character = Character.Male;
   position: Position;
   damageLevel: number;
   size: Size;
@@ -308,15 +295,15 @@ export class Player implements ICharacter {
     );
 
     // Set the stroke style to red
-    context.strokeStyle = "red";
+    // context.strokeStyle = "red";
 
-    // Draw the rectangle around the player's image
-    context.strokeRect(
-      this.position.x,
-      this.position.y,
-      this.size.width,
-      this.size.height
-    );
+    // // Draw the rectangle around the player's image
+    // context.strokeRect(
+    //   this.position.x,
+    //   this.position.y,
+    //   this.size.width,
+    //   this.size.height
+    // );
   }
 
   //increase the count of kunai
@@ -463,7 +450,7 @@ export class Player implements ICharacter {
   }
 
   updateAnimation(): void {
-    const { maxFrame, frameWidth, frameHeight, animationFrameRate } =
+    const { maxFrame, animationFrameRate } =
       this.animationSettings[this.animationState];
     this.maxFrame = maxFrame;
 

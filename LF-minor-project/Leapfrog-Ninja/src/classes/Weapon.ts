@@ -1,6 +1,3 @@
-import { Platform } from "../interfaces/interface";
-import { Player } from "./player";
-import scrollImage from "../assets/Images/gameplay/scroll.png";
 import { assetsManager } from "./AssetsManager";
 
 interface Position {

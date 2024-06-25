@@ -1,4 +1,4 @@
-import { AttackType, ICharacter } from "../interfaces/interface";
+import { ICharacter } from "../interfaces/interface";
 import { Game } from "./game";
 
 export class InputHandler {
@@ -24,7 +24,6 @@ export class InputHandler {
 
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
     window.addEventListener("keyup", this.handleKeyUp.bind(this));
-    window.addEventListener("click", this.handleMouseClick.bind(this));
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -44,10 +43,6 @@ export class InputHandler {
 
     // Set character to idle when a key is released
     this.character.move("idle");
-  }
-
-  private handleMouseClick(event: MouseEvent): void {
-    // Handle mouse click events
   }
 
   private processInput(): void {

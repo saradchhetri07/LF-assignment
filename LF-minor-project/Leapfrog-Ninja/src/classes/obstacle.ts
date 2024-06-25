@@ -1,9 +1,9 @@
-import { Drawable, Position, Size, Updatable } from "../interfaces/interface";
+import { Drawable, Position, Size } from "../interfaces/interface";
 
 /**
  * Class representing an obstacle.
  */
-export class Obstacle implements Drawable, Updatable {
+export class Obstacle implements Drawable {
   position: Position;
   size: Size;
   type: string;
@@ -44,10 +44,6 @@ export class Obstacle implements Drawable, Updatable {
    * Update the obstacle's state.
    * @param {number} deltaTime - The time elapsed since the last update.
    */
-
-  update(deltaTime: number): void {
-    // Update obstacle state
-  }
 
   /**
    * Handle collisions with other objects.

@@ -1,4 +1,3 @@
-import { Sound } from "./interfaces/interface";
 import { assetsManager } from "./classes/AssetsManager";
 import "./style.css";
 import { Game } from "./classes/game";
@@ -9,6 +8,7 @@ import { Character } from "./enums/character";
 import { GameDifficulty } from "./enums/difficulty";
 import { GameMode } from "./enums/mode";
 import { SoundMode } from "./enums/sound";
+import { instruction } from "./utils/instruction";
 
 window.addEventListener("load", () => {
   const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
@@ -16,9 +16,9 @@ window.addEventListener("load", () => {
   canvas.width = CANVAS_DIMENSIONS.CANVAS_WIDTH;
   canvas.height = CANVAS_DIMENSIONS.CANVAS_HEIGHT;
 
-  let chosenCharacter = Character.None;
+  let chosenCharacter = Character.Male;
   let selectedMode: GameDifficulty = GameDifficulty.Easy; // Default mode
-  let gameMode: GameMode = GameMode.Multiplayer;
+  let gameMode: GameMode = GameMode.Computer;
   let soundModeStatus: SoundMode = SoundMode.ON;
 
   if (!canvas) {
@@ -55,9 +55,11 @@ window.addEventListener("load", () => {
       "difficulty"
     ) as HTMLButtonElement;
 
+    //starting screen mode button
     const modeButton = document.getElementById("playmode") as HTMLButtonElement;
 
     const okButton = document.getElementById("okID") as HTMLButtonElement;
+
     const soundButton = document.getElementById("soundId") as HTMLButtonElement;
 
     const ninjaBoyButton = document.getElementById(
@@ -81,6 +83,7 @@ window.addEventListener("load", () => {
     const soundMode = document.getElementById(
       "soundSelector"
     ) as HTMLDivElement;
+
     const onRadio = document.getElementById("onRadio") as HTMLInputElement;
     const offRadio = document.getElementById("onRadio") as HTMLInputElement;
 
@@ -89,10 +92,6 @@ window.addEventListener("load", () => {
     ) as HTMLDivElement;
     const computerRadio = document.getElementById(
       "computer"
-    ) as HTMLInputElement;
-
-    const multiPlayerRadio = document.getElementById(
-      "multiPlayer"
     ) as HTMLInputElement;
 
     playGameButton.style.display = "block";
@@ -135,7 +134,9 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
       soundMode.style.display = "block";
+      okButton.style.display = "block";
     });
+
     // // Add event listeners for buttons
     playGameButton.addEventListener("click", () => {
       ctx.clearRect(
@@ -145,7 +146,9 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
       clearStartButton();
+
       okButton.style.display = "block";
+
       if (gameMode == GameMode.Computer) {
         ctx.drawImage(
           assetsManager.sprites.DIFFICULTYSCREEN,
@@ -154,6 +157,7 @@ window.addEventListener("load", () => {
           CANVAS_DIMENSIONS.CANVAS_WIDTH,
           CANVAS_DIMENSIONS.CANVAS_HEIGHT
         );
+
         // Draw text on canvas
         ctx.font = "20px Press Start 2P";
         ctx.textAlign = "center";
@@ -163,13 +167,7 @@ window.addEventListener("load", () => {
           CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2
         );
       } else {
-        ctx.drawImage(
-          assetsManager.sprites.CONTROLSCREEN,
-          0,
-          0,
-          CANVAS_DIMENSIONS.CANVAS_WIDTH,
-          CANVAS_DIMENSIONS.CANVAS_HEIGHT
-        );
+        instruction(ctx);
       }
       okButton.addEventListener("click", () => {
         okButton.style.display = "none";
@@ -240,6 +238,8 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_WIDTH,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
+      soundMode.style.display = "none";
+      okButton.addEventListener("click", () => {});
     });
 
     ninjaBoyButton.addEventListener("click", () => {
@@ -264,9 +264,9 @@ window.addEventListener("load", () => {
 
     okButton.addEventListener("click", () => {
       okButton.style.display = "none";
-      okButton.style.marginTop = "40px";
       modeSelector.style.display = "none";
       gameModeSelector.style.display = "none";
+      soundMode.style.display = "none";
       initializeStartButton();
       drawStartScreen(ctx);
     });
@@ -289,6 +289,13 @@ window.addEventListener("load", () => {
 
       modeSelector.style.display = "block";
       okButton.style.display = "block";
+
+      // okButton.addEventListener("click", () => {
+      //   okButton.style.display = "none";
+      //   modeButton.style.display = "none";
+      //   initializeStartButton();
+      //   drawStartScreen(ctx);
+      // });
     });
 
     modeSelector.addEventListener("change", () => {
@@ -301,6 +308,7 @@ window.addEventListener("load", () => {
       }
     });
 
+    //game mode selector is for selector to play multiplayer or with computer
     gameModeSelector.addEventListener("change", () => {
       if (computerRadio.checked) {
         gameMode = GameMode.Computer;
@@ -309,6 +317,7 @@ window.addEventListener("load", () => {
       }
     });
 
+    //mode button is to go to the is  difficulty set up screen
     modeButton.addEventListener("click", () => {
       ctx.clearRect(
         0,
@@ -324,15 +333,20 @@ window.addEventListener("load", () => {
         CANVAS_DIMENSIONS.CANVAS_WIDTH,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT
       );
-
+      soundMode.style.display = "none";
       gameModeSelector.style.display = "block";
       okButton.style.display = "block";
+
+      okButton.addEventListener("click", () => {
+        okButton.style.display = "none";
+        drawStartScreen(ctx);
+      });
     });
 
     onRadio.addEventListener("click", () => {
       if (onRadio.checked) {
         soundModeStatus = SoundMode.ON;
-      } else {
+      } else if (offRadio.checked) {
         soundModeStatus = SoundMode.OFF;
       }
     });
@@ -343,6 +357,7 @@ window.addEventListener("load", () => {
       chooseCharacterButton.style.display = "block";
       difficultyButton.style.display = "block";
       modeButton.style.display = "block";
+      soundButton.style.display = "block";
     }
 
     function clearStartButton(): void {
@@ -356,6 +371,19 @@ window.addEventListener("load", () => {
 
     function startGame() {
       clearStartButton();
+      const initialGame = new Game(
+        canvas,
+        ctx!,
+        //play with computer or multiplayer mode
+        gameMode,
+        chosenCharacter,
+        //difficulty mode
+        selectedMode,
+        soundModeStatus
+      );
+
+      assetsManager.setInitialGameInstance(initialGame);
+
       const game = new Game(
         canvas,
         ctx!,
@@ -366,6 +394,7 @@ window.addEventListener("load", () => {
         selectedMode,
         soundModeStatus
       );
+
       game.start();
     }
   });

@@ -23,6 +23,7 @@ import { GameDifficulty } from "../enums/difficulty";
 import { assetsManager } from "./AssetsManager";
 import { SoundMode } from "../enums/sound";
 import { Weapon } from "./Weapon";
+import { gameOverScreen } from "./gameOverScreen";
 
 /**
  * Class representing the main game.
@@ -31,15 +32,16 @@ export class Game implements Drawable {
   private player: Player;
   private enemy: BaseEnemy; // Assuming one enemy
   private hud: HUD;
-  private damageFactor?: number; // factor of damage
-  private inputHandler1: InputHandler;
-  private inputHandler2: InputHandler;
-  private animationId: number = 0;
+
+  inputHandler1: InputHandler;
+  inputHandler2: InputHandler;
+  damageFactor: number = 0;
+
   private levelManager: LevelManager;
   private lastTime: number;
   private enemyWeaponLeft: boolean = false;
 
-  private timerCounter: number = 0;
+  timerCounter: number = 0;
 
   private canvas: HTMLCanvasElement;
 
@@ -154,9 +156,9 @@ export class Game implements Drawable {
       {
         j: "moveLeft",
         l: "moveRight",
-        i: "moveUp",
-        z: "Attack",
-        x: "ThrowWeapon",
+        // i: "moveUp",
+        n: "Attack",
+        m: "ThrowWeapon",
       },
       this
     );
@@ -177,11 +179,7 @@ export class Game implements Drawable {
    */
   private makeHealthPotion(): void {
     const healthPotion = new HealthPotion(0, 0, 1);
-    healthPotion.makeHealthPotion(
-      this.ninjaPlatforms,
-      this.player.size.height,
-      this.player.initialY
-    );
+    healthPotion.makeHealthPotion(this.ninjaPlatforms);
     this.healthPotion = healthPotion;
   }
 
@@ -233,9 +231,8 @@ export class Game implements Drawable {
       {
         j: "moveLeft",
         l: "moveRight",
-        i: "moveUp",
-        z: "Attack",
-        x: "ThrowWeapon",
+        n: "Attack",
+        m: "ThrowWeapon",
       },
       this
     );
@@ -287,13 +284,13 @@ export class Game implements Drawable {
     this.context.strokeStyle = "red";
     this.context.lineWidth = 2;
 
-    if (this.levelManager.getCurrentLevel() === 1) {
-      this.context.strokeRect(200, 300, 200, 12);
-      this.context.strokeRect(650, 320, 80, 12);
-    }
+    // if (this.levelManager.getCurrentLevel() === 1) {
+    //   this.context.strokeRect(200, 300, 200, 12);
+    //   this.context.strokeRect(650, 320, 80, 12);
+    // }
     if (this.levelManager.getCurrentLevel() === 2) {
       this.context.fillStyle = "green";
-      this.context.strokeRect(250, 368, 230, 18);
+      // this.context.strokeRect(250, 368, 230, 18);
       this.context.fillRect(
         CANVAS_DIMENSIONS.CANVAS_WIDTH / 2,
         CANVAS_DIMENSIONS.CANVAS_HEIGHT / 2,
@@ -348,7 +345,9 @@ export class Game implements Drawable {
     this.lastTime = timestamp;
 
     this.draw();
+
     this.update(deltaTime);
+
     this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this)); // Store the animation frame ID
   }
 
@@ -364,23 +363,35 @@ export class Game implements Drawable {
         levelCompleted(
           this.context,
           this.canvas,
-          this.startNextLevel.bind(this)
+          this.startNextLevel.bind(this),
+          this.player
         );
         return;
       }
     }
 
-    // if (this.enemy.health < 30 && this.enemy.type == "level_2_Sublevel_1") {
-    //   // this.enemy.disappearEnemy(this.context);
-    //   // this.enemy.reappearEnemy(this.context);
-    //   this.enemy.health = 100;
-    // }
+    if (this.player.isDead) {
+      gameOverScreen(this.context);
+      const restartButton = document.getElementById(
+        "restartId"
+      ) as HTMLButtonElement;
+
+      restartButton.style.display = "block";
+
+      restartButton.addEventListener("click", () => {
+        window.location.reload();
+      });
+      return;
+    }
+
     this.kunaiIsPicked();
     this.scrollIsPicked();
 
     // bot movement
     if (this.mode === GameMode.Computer) {
-      this.enemy.automateBehavior(this.player);
+      setTimeout(() => {
+        this.enemy.automateBehavior(this.player);
+      }, 3000);
     }
 
     this.player.draw(this.context);

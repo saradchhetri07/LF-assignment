@@ -1,6 +1,6 @@
 import { Platform } from "../interfaces/interface";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
-import { getRandomValue } from "../utils/randomValue";
+
 import { assetsManager } from "./AssetsManager";
 
 interface Drawable {
@@ -47,11 +47,7 @@ export class HealthPotion implements Drawable {
    * @param {number} playerHeight - The height of the player.
    * @param {number} initialY - The initial y-coordinate of the player.
    */
-  makeHealthPotion(
-    platforms: Platform[],
-    playerHeight: number,
-    initialY: number
-  ): void {
+  makeHealthPotion(platforms: Platform[]): void {
     const localHealthPotions: HealthPotion[] = [];
 
     for (let i = 0; i < platforms.length; i++) {

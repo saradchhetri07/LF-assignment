@@ -3,7 +3,6 @@ import { BaseEnemy } from "./enemy";
 import { Drawable, Updatable } from "../interfaces/interface";
 import { Player } from "./player";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
-import { HealthPotion } from "./healthPotion";
 import { assetsManager } from "./AssetsManager";
 
 /**

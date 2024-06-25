@@ -1,4 +1,3 @@
-import { Sound } from "./../interfaces/interface";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 
 import background from "../assets/sounds/backgroundMusic.ogg";
@@ -102,12 +101,14 @@ import bossThrowable from "../assets/Images/enemy/bossThrowable.png";
 import orkThrowable from "../assets/Images/enemy/orkThrowable.png";
 import bombs from "../assets/Images/enemy/star.png";
 import { SoundMode } from "../enums/sound";
+import { Game } from "./game";
 
 class AssetsManager {
   private static instance: AssetsManager;
   public audios: { [key: string]: HTMLAudioElement } = {};
   public sprites: { [key: string]: HTMLImageElement } = {};
   public isSoundOn: boolean = true;
+  public initialGame?: Game;
   private assetsStillLoading: number = 0;
   private numAssets: number = 0;
   private loadedPercent: number = 0;
@@ -119,6 +120,14 @@ class AssetsManager {
       AssetsManager.instance = new AssetsManager();
     }
     return AssetsManager.instance;
+  }
+
+  public setInitialGameInstance(initalGame: Game): void {
+    this.initialGame = initalGame;
+  }
+
+  public getInitialGameInstance(): Game {
+    return this.initialGame!;
   }
 
   public toggleSound(status: SoundMode) {
@@ -303,7 +312,10 @@ class AssetsManager {
       ctx.closePath();
 
       if (this.assetsStillLoading === 0) {
-        callback(); // Call the callback function once all assets are loaded
+        setTimeout(() => {
+          callback();
+        }, 2000);
+        // Call the callback function once all assets are loaded
       } else {
         window.requestAnimationFrame(() => assetsLoadingLoop(callback)); // Continue the loop
       }

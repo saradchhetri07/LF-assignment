@@ -33,6 +33,7 @@ canvas {
 .ninjaGirlCharacter,
 .difficulty,
 .mode,
+.restart,
 .ok,
 .sound {
   position: absolute;
@@ -59,6 +60,12 @@ canvas {
   width: 129px;
   top: 444px;
   left: 343px;
+  display: none;
+}
+.restart {
+  width: 129px;
+  top: 444px;
+  left: 386px;
   display: none;
 }
 .sound {
@@ -105,9 +112,9 @@ label {
   display: none;
 }
 .ok {
-  width: 50px;
-  top: 315px;
-  left: 320px;
+  width: 116px;
+  top: 490px;
+  left: 432px;
   display: none;
 }
 .playGame {
@@ -133,8 +140,8 @@ label {
 }
 
 .levelCompleted {
-  top: 380px;
-  left: 275px;
+  top: 473px;
+  left: 383px;
   display: none;
 }
 .playAgain {
@@ -153,6 +160,7 @@ label {
 .ninjaGirlCharacter:hover,
 .difficulty:hover,
 .mode:hover,
+.restart:hover,
 .sound:hover,
 .ok:hover {
   color: #ca440d;

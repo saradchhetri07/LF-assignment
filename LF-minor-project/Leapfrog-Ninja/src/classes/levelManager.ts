@@ -1,20 +1,8 @@
 import { makeLevelEnemies } from "./../utils/levelEnemies";
 import { Level } from "./level";
 
-import {
-  Level1Enemy1,
-  Level1Enemy2,
-  Level2Enemy1,
-  Level2Enemy2,
-  Level3Enemy1,
-  Level3Enemy2,
-  Level4Enemy1,
-  Level4Enemy2,
-} from "./levelEnemy";
-
 import { BaseEnemy } from "./enemy";
 import { makeLevelImages } from "../utils/levelImages";
-import { Obstacle } from "./obstacle";
 
 /**
  * Class representing the level manager.

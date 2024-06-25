@@ -1,6 +1,4 @@
 import { Platform } from "./../interfaces/interface";
-import { Level } from "./level";
-import { Player } from "../classes/player";
 import kunaiImage from "../assets/Images/player/kunaiIcon.png";
 import leftKunaiImage from "../assets/Images/enemy/kunaiLeft.png";
 interface Drawable {
@@ -107,13 +105,13 @@ export class Kunai implements Drawable {
         kunai.size.height
       );
 
-      context.strokeStyle = "red";
-      context.strokeRect(
-        kunai.position.x,
-        kunai.position.y,
-        kunai.size.width,
-        kunai.size.height
-      );
+      // context.strokeStyle = "red";
+      // context.strokeRect(
+      //   kunai.position.x,
+      //   kunai.position.y,
+      //   kunai.size.width,
+      //   kunai.size.height
+      // );
     });
   }
 

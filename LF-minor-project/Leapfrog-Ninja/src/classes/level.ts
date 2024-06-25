@@ -1,11 +1,10 @@
-import { Drawable, Updatable } from "../interfaces/interface";
+import { Drawable } from "../interfaces/interface";
 import { BaseEnemy } from "./enemy";
-import { Obstacle } from "./obstacle";
 
 /**
  * Class representing a game level.
  */
-export class Level implements Drawable, Updatable {
+export class Level implements Drawable {
   number: number = 1;
   subLevel: number = 0;
   backgroundImages: HTMLImageElement[];
@@ -82,12 +81,6 @@ export class Level implements Drawable, Updatable {
    * Update the level's state.
    * @param {number} deltaTime - The time elapsed since the last update.
    */
-  update(deltaTime: number): void {
-    // this.getCurrentEnemy().update(deltaTime);
-    // this.items.forEach((item) => item.update(deltaTime));
-    // this.obstacles.forEach((obstacle) => obstacle.update(deltaTime));
-    // this.checkCompletion();
-  }
 
   /**
    * Check if the level is completed.

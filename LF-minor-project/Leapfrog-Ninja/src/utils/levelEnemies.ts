@@ -1,13 +1,4 @@
-import { assetsManager } from "./../classes/AssetsManager";
 import { BaseEnemy } from "../classes/enemy";
-import {
-  Level1Enemy1,
-  Level1Enemy2,
-  Level2Enemy1,
-  Level2Enemy2,
-  Level3Enemy1,
-  Level3Enemy2,
-} from "../classes/levelEnemy";
 import enemyImage from "../assets/Images/enemy/enemyIdle.png";
 import enemyHeadImage from "../assets/Images/enemy/enemyIcon.png";
 

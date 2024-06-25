@@ -1,7 +1,7 @@
 import { Size } from "./../interfaces/interface";
-import { AttackType, ICharacter, Position } from "../interfaces/interface";
+import { ICharacter, Position } from "../interfaces/interface";
 import { getEnemySprite } from "../utils/getEnemySprite";
-import Level_1_Sublevel_1_Enemy_Attack from "../assets/Images/enemy/enemyAttacking.png";
+
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 import { Player } from "./player";
 import { assetsManager } from "./AssetsManager";
@@ -51,7 +51,7 @@ export class BaseEnemy implements ICharacter {
   velocity: { x: number; y: number };
   isJumping: boolean;
   isAttacking: boolean = false;
-  isTurningLeft: boolean = false;
+  isTurningLeft: boolean = true;
   isTurningRight: boolean = false;
   type: string;
   isOnGround: boolean = true;
@@ -60,8 +60,6 @@ export class BaseEnemy implements ICharacter {
   isDead = false;
 
   enemyHead: HTMLImageElement;
-
-  private throwWeaponTimer: number | null = null;
 
   private verticalFrameTimer: number | null;
   private animationSettings: { [key in AnimationState]: AnimationSettings };
@@ -226,6 +224,8 @@ export class BaseEnemy implements ICharacter {
    */
   private setIdleState(): void {
     this.animationState = AnimationState.Idle;
+    this.isJumping = false;
+    this.updateAnimation();
   }
 
   /**
@@ -257,9 +257,7 @@ export class BaseEnemy implements ICharacter {
     if (!this.isJumping) {
       this.isJumping = true;
       this.animationState = AnimationState.moveUp;
-      this.isOnGround = false;
       this.updateAnimation();
-      console.log("jumping variable changed", this.isJumping);
     }
   }
 
@@ -302,14 +300,14 @@ export class BaseEnemy implements ICharacter {
       this.size.height
     );
 
-    // Draw the rectangle around the enemy's image
-    context.strokeStyle = "red";
-    context.strokeRect(
-      this.position.x,
-      this.position.y,
-      this.size.width,
-      this.size.height
-    );
+    // // Draw the rectangle around the enemy's image
+    // context.strokeStyle = "red";
+    // context.strokeRect(
+    //   this.position.x,
+    //   this.position.y,
+    //   this.size.width,
+    //   this.size.height
+    // );
   }
 
   hitEffect(attackFromLeft: boolean): void {
@@ -460,7 +458,7 @@ export class BaseEnemy implements ICharacter {
   automateBehavior(player: Player): void {
     // Calculate the distance between the enemy and the player
     const distanceToPlayer =
-      player.position.x - this.position.x + player.size.width;
+      player.position.x - this.position.x + player.size.width / 3;
 
     // Move towards the player if not close enough to attack
     if (Math.abs(distanceToPlayer) > this.size.width) {
@@ -470,7 +468,9 @@ export class BaseEnemy implements ICharacter {
         this.move("moveLeft");
       }
     } else {
-      this.move("Attack");
+      setTimeout(() => {
+        this.move("Attack");
+      }, 3000);
     }
   }
 
@@ -478,7 +478,7 @@ export class BaseEnemy implements ICharacter {
    * Update the enemy's animation.
    */
   private updateAnimation(): void {
-    const { maxFrame, frameWidth, frameHeight, animationFrameRate } =
+    const { maxFrame, animationFrameRate } =
       this.animationSettings[this.animationState];
     this.maxFrame = maxFrame;
 
@@ -488,9 +488,9 @@ export class BaseEnemy implements ICharacter {
         : animationFrameRate;
 
     if (this.animationState == AnimationState.Attack) {
-      this.handleVerticalAnimation();
+      this.handleVerticalAnimation(animationFrameRate);
     } else if (this.animationState == AnimationState.Dead) {
-      this.handleDeadAnimation();
+      this.handleDeadAnimation(animationFrameRate);
     } else {
       this.handleRegularAnimation(currentAnimationFrameRate);
     }
@@ -552,18 +552,25 @@ export class BaseEnemy implements ICharacter {
    * Handle the animation for vertical movements.
    * @param {number} frameRate - The frame rate for the animation.
    */
-  private handleVerticalAnimation(): void {
-    this.frameY =
-      (this.frameY + 1) % this.animationSettings[this.animationState].rows;
+  private handleVerticalAnimation(frameRate: number): void {
+    if (!this.verticalFrameTimer) {
+      this.verticalFrameTimer = setTimeout(() => {
+        this.frameY =
+          (this.frameY + 1) % this.animationSettings[this.animationState].rows;
+        this.verticalFrameTimer = null; // Reset timer after the frame update
+      }, 1000 / frameRate); // Delay for the vertical frames
+    }
   }
 
   /**
    * Handle the animation for the dead state.
    * @param {number} frameRate - The frame rate for the animation.
    */
-  private handleDeadAnimation(): void {
-    this.frameY =
-      (this.frameY + 1) % this.animationSettings[this.animationState].rows;
+  private handleDeadAnimation(frameRate: number): void {
+    if (this.animationFrameCount++ >= frameRate) {
+      this.animationFrameCount = 0;
+      this.frameY = this.frameY + 1;
+    }
   }
 
   /**
@@ -571,8 +578,8 @@ export class BaseEnemy implements ICharacter {
    * @param {number} frameRate - The frame rate for the animation.
    */
   private handleRegularAnimation(frameRate: number): void {
-    this.animationFrameCount = 0;
     if (this.animationFrameCount++ >= frameRate) {
+      this.animationFrameCount = 0;
       this.frameY =
         (this.frameY + 1) % this.animationSettings[this.animationState].rows;
     }

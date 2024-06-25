@@ -1,5 +1,4 @@
 import { Platform } from "./../interfaces/interface";
-import { Player } from "../classes/player";
 import scrollImage from "../assets/Images/gameplay/scroll.png";
 
 interface Drawable {
@@ -60,16 +59,16 @@ export class Scroll implements Drawable {
         this.size.height
       );
 
-      // Set the stroke style to red
-      context.strokeStyle = "red";
+      // // Set the stroke style to red
+      // context.strokeStyle = "red";
 
-      // Draw the rectangle around the player's image
-      context.strokeRect(
-        scroll.position.x,
-        scroll.position.y - scroll.size.height - 40,
-        this.size.width,
-        this.size.height
-      );
+      // // Draw the rectangle around the player's image
+      // context.strokeRect(
+      //   scroll.position.x,
+      //   scroll.position.y - scroll.size.height - 40,
+      //   this.size.width,
+      //   this.size.height
+      // );
     });
   }
 
@@ -80,6 +79,4 @@ export class Scroll implements Drawable {
   incrementScrollLevel(): void {
     this.Level++;
   }
-
-  update(deltaTime: number) {}
 }
