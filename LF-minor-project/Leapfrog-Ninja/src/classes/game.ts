@@ -131,6 +131,8 @@ export class Game implements Drawable {
   ) {
     this.canvas = canvas;
     this.context = context;
+    console.log("game mode is", gamemode);
+
     this.mode = gamemode;
     this.chosenCharacter = chosenCharacter;
     this.difficultyMode = difficultyMode;
@@ -459,7 +461,9 @@ export class Game implements Drawable {
     this.scrollIsPicked();
 
     // bot movement
-    this.enemy.automateBehavior(this.player);
+    if (this.mode == GameMode.Computer) {
+      this.enemy.automateBehavior(this.player);
+    }
 
     this.player.draw(this.context);
     this.player.update(deltaTime, this.ninjaPlatforms);
