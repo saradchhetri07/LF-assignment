@@ -37,7 +37,7 @@ export class Player implements ICharacter {
   maxHealth: number;
   kunaiCount: number = 20;
   lastDamageTime: number = 0;
-  damageCooldown: number = 1000;
+  damageCooldown: number = 500;
   frameX: number;
   frameY: number;
   maxFrame: number;
@@ -116,7 +116,7 @@ export class Player implements ICharacter {
     this.velocity = { x: 0, y: 0 };
     this.isJumping = false;
 
-    this.damageLevel = 4; //out of 10
+    this.damageLevel = 8; //out of 10
 
     this.animationState = AnimationState.Idle;
     this.animationFrameRate = 10; // Adjust based on needs
@@ -335,8 +335,8 @@ export class Player implements ICharacter {
     // } else {
     //   console.log(`Player health: ${this.health}`);
     // }
-    const currentTime = Date.now();
 
+    const currentTime = Date.now();
     // Check if enough time has passed since the last damage
     if (currentTime - this.lastDamageTime >= this.damageCooldown) {
       this.health -= damage;

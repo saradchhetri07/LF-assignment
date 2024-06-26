@@ -24,6 +24,7 @@ import { assetsManager } from "./AssetsManager";
 import { SoundMode } from "../enums/sound";
 import { Weapon } from "./Weapon";
 import { gameOverScreen } from "./gameOverScreen";
+import { gameCompleted } from "../utils/gameCompleted";
 
 /**
  * Class representing the main game.
@@ -59,6 +60,8 @@ export class Game implements Drawable {
   private scroll?: Scroll;
   private enemyWeapon?: Weapon[] = [];
   private healthPotion?: HealthPotion;
+
+  // this.context.fillRect(160, 275, 173, 12);
   private ninjaPlatforms: Platform[] = [
     { x: 200, y: 300, width: 200, height: 12, level: 1, forPlacingKunai: true },
     { x: 650, y: 320, width: 80, height: 12, level: 1, forPlacingKunai: false },
@@ -71,6 +74,7 @@ export class Game implements Drawable {
       level: 2,
       forPlacingKunai: false,
     },
+
     {
       x: 160,
       y: 275,
@@ -79,7 +83,32 @@ export class Game implements Drawable {
       level: 3,
       forPlacingKunai: false,
     },
-    { x: 160, y: 275, width: 173, height: 12, level: 3, forPlacingKunai: true },
+    {
+      x: CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 100,
+      y: 320,
+      width: 320,
+      height: 12,
+      level: 3,
+      forPlacingKunai: true,
+    },
+
+    {
+      x: 160,
+      y: 275,
+      width: 173,
+      height: 12,
+      level: 4,
+      forPlacingKunai: true,
+    },
+
+    {
+      x: CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 100,
+      y: 320,
+      width: 320,
+      height: 12,
+      level: 3,
+      forPlacingKunai: false,
+    },
   ];
 
   /**
@@ -300,6 +329,33 @@ export class Game implements Drawable {
         20
       );
     }
+    {
+      if (this.levelManager.getCurrentLevel() === 3) {
+        this.context.fillStyle = "yellow";
+        // this.context.strokeRect(250, 368, 230, 18);
+        this.context.fillRect(160, 275, 173, 12);
+
+        this.context.fillRect(
+          CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 100,
+          320,
+          320,
+          12
+        );
+      }
+
+      if (this.levelManager.getCurrentLevel() === 4) {
+        this.context.fillStyle = "yellow";
+
+        this.context.fillRect(160, 275, 173, 12);
+
+        this.context.fillRect(
+          CANVAS_DIMENSIONS.CANVAS_WIDTH / 2 + 100,
+          320,
+          320,
+          12
+        );
+      }
+    }
   }
 
   /**
@@ -358,10 +414,24 @@ export class Game implements Drawable {
    * @param {number} deltaTime - The time elapsed since the last update.
    */
   update(deltaTime: number): void {
+    console.log("enemy death status", this.enemy.isDead);
+
     if (!this.enemy.isDead) {
       this.enemy.draw(this.context);
     } else {
+      // Log enemy's death status
+      console.log("Enemy is dead.");
+
       if (this.player.isScrollCollected) {
+        console.log(
+          "Both enemy is dead and scroll is collected. Proceeding to next level."
+        );
+
+        if (this.levelManager.getCurrentLevel() == 4) {
+          gameCompleted(this.context);
+          return;
+        }
+
         levelCompleted(
           this.context,
           this.canvas,
@@ -369,6 +439,9 @@ export class Game implements Drawable {
           this.player
         );
         return;
+      } else {
+        // Log if the scroll has not been collected
+        console.log("Enemy is dead, but scroll is not collected.");
       }
     }
 
@@ -390,11 +463,7 @@ export class Game implements Drawable {
     this.scrollIsPicked();
 
     // bot movement
-    if (this.mode === GameMode.Computer) {
-      setTimeout(() => {
-        this.enemy.automateBehavior(this.player);
-      }, 3000);
-    }
+    this.enemy.automateBehavior(this.player);
 
     this.player.draw(this.context);
     this.player.update(deltaTime, this.ninjaPlatforms);
@@ -468,9 +537,11 @@ export class Game implements Drawable {
           const scrollPickSound = assetsManager.audios.SCROLLGRAB;
           scrollPickSound.play();
         }
+
         this.scroll?.localScroll.splice(i, 1);
         this.player.increaseScrollCount();
         this.player.isScrollCollected = true;
+        console.log("scroll has been colleceted");
       }
     });
   }

@@ -50,5 +50,21 @@ export const getEnemySprite = (
     }
   }
 
+  if (type == "level_4_Sublevel_1") {
+    if (state == "Idle") {
+      return assetsManager.sprites.SAMURAIHEAVYIDLE;
+    } else if (state == "Run") {
+      return assetsManager.sprites.SAMURAIHEAVYRUNNING;
+    } else if (state == "Attack") {
+      return assetsManager.sprites.SAMURAIHEAVYATTACKING;
+    } else if (state == "Dead") {
+      return assetsManager.sprites.SAMURAIHEAVYDYING;
+    } else if (state == "moveUp") {
+      return assetsManager.sprites.SAMURAIHEAVYIDLE;
+    } else if (state == "ThrowWeapon") {
+      return assetsManager.sprites.SAMURAIHEAVYATTACKING;
+    }
+  }
+
   return assetsManager.sprites.SAMURAIDLE;
 };

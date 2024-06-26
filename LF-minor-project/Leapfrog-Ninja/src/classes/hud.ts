@@ -45,7 +45,7 @@ export class HUD implements Drawable, Updatable {
   draw(context: CanvasRenderingContext2D): void {
     // Draw the player icon and health bar at the top
     context.drawImage(this.player.playerHead, 20, 20, 80, 80);
-    this.drawHealthBar(context, 20, 110, 200, 20, this.player.health);
+    this.drawHealthBar(context, 20, 110, 200, 20, this.player.health, true);
 
     // Draw the enemy icon and health bar at the top
     context.drawImage(
@@ -61,7 +61,8 @@ export class HUD implements Drawable, Updatable {
       110,
       200,
       20,
-      this.baseEnemy.health
+      this.baseEnemy.health,
+      false
     );
 
     // Set the background color for the HUD at the bottom
@@ -138,7 +139,8 @@ export class HUD implements Drawable, Updatable {
     y: number,
     width: number,
     height: number,
-    health: number
+    health: number,
+    forPlayer: boolean
   ): void {
     // Draw the background of the health bar
     context.fillStyle = "grey";
@@ -154,6 +156,10 @@ export class HUD implements Drawable, Updatable {
 
     // Draw the current health
     context.fillStyle = gradient;
+    if (this.player.health < 30 && forPlayer) {
+      context.fillStyle = "red";
+    }
+
     context.fillRect(x, y, currentHealthWidth, height);
 
     // Draw the border of the health bar

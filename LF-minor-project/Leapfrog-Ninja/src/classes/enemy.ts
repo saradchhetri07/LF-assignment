@@ -324,21 +324,26 @@ export class BaseEnemy implements ICharacter {
    * @param {number} damage - The amount of damage to inflict.
    */
   decreaseHealth(damage: number): void {
-    const currentTime = Date.now();
+    // const currentTime = Date.now();
 
-    // Check if enough time has passed since the last damage
-    if (currentTime - this.lastDamageTime >= this.damageCooldown) {
-      this.health -= damage;
-      this.lastDamageTime = currentTime; // Update the last damage time
+    // if (this.health <= 0) {
+    //   this.health = 0;
+    //   this.animationState = AnimationState.Dead;
+    // }
 
-      if (this.health <= 0) {
-        this.health = 0;
-        this.animationState = AnimationState.Dead;
-      } else {
-        console.log(`Player health: ${this.health}`);
-      }
+    // // Check if enough time has passed since the last damage
+    // if (currentTime - this.lastDamageTime >= this.damageCooldown) {
+    //   this.health -= damage;
+    //   this.lastDamageTime = currentTime; // Update the last damage time
+    // } else {
+    //   console.log(`Damage cooldown active. Health: ${this.health}`);
+    // }
+    this.health -= damage;
+    if (this.health <= 0) {
+      this.health = 0;
+      this.animationState = AnimationState.Dead;
     } else {
-      console.log(`Damage cooldown active. Health: ${this.health}`);
+      console.log(`Player health: ${this.health}`);
     }
   }
 
@@ -406,7 +411,20 @@ export class BaseEnemy implements ICharacter {
       if (assetsManager.getSoundStatus() && this.type == "level_2_Sublevel_1") {
         const orkSound = assetsManager.audios.ORKSOUND;
         orkSound.play();
+      } else if (
+        assetsManager.getSoundStatus() &&
+        this.type == "level_3_Sublevel_1"
+      ) {
+        const dangerSound = assetsManager.audios.DANGER;
+        dangerSound.play();
+      } else if (
+        assetsManager.getSoundStatus() &&
+        this.type == "level_4_Sublevel_1"
+      ) {
+        const earthCracking = assetsManager.audios.EARTHCRACKING;
+        earthCracking.play();
       }
+
       this.isAttacking = false;
       this.isJumping = false;
       this.image = getEnemySprite(this.type, "Idle");
@@ -439,6 +457,7 @@ export class BaseEnemy implements ICharacter {
     }
 
     if (this.animationState == AnimationState.Dead) {
+      this.isDead = true;
       this.isAttacking = false;
       this.image = getEnemySprite(this.type, "Dead");
     }
@@ -505,30 +524,6 @@ export class BaseEnemy implements ICharacter {
       this.handleRegularAnimation(currentAnimationFrameRate);
     }
   }
-
-  // //disappearing enemy
-  // disappearEnemy(ctx: CanvasRenderingContext2D): void {
-  //   if (this.type == "level_2_Sublevel_1") {
-  //     //making the aura for enemy to disappear
-  //     // ctx.drawImage(
-  //     //   assetsManager.sprites.AURA,
-  //     //   this.position.x,
-  //     //   this.position.y + this.size.height,
-  //     //   this.size.width,
-  //     //   this.size.height * 0.2
-  //     // );
-
-  //     // Set a timeout to clear the enemy after 3 seconds
-  //     setTimeout(() => {
-  //       ctx.clearRect(
-  //         this.position.x,
-  //         this.position.y,
-  //         this.size.width,
-  //         this.size.height
-  //       );
-  //     }, 3000);
-  //   }
-  // }
 
   //reappear enemy with added health
   reappearEnemy(ctx: CanvasRenderingContext2D): void {
