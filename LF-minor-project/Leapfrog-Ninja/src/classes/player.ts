@@ -36,6 +36,8 @@ export class Player implements ICharacter {
   power: number;
   maxHealth: number;
   kunaiCount: number = 20;
+  lastDamageTime: number = 0;
+  damageCooldown: number = 1000;
   frameX: number;
   frameY: number;
   maxFrame: number;
@@ -326,12 +328,28 @@ export class Player implements ICharacter {
 
   //function to decrease the player health when hit by opponent
   decreaseHealth(damage: number): void {
-    this.health -= damage;
-    if (this.health <= 0) {
-      this.health = 0;
-      this.animationState = AnimationState.Dead;
+    // this.health -= damage;
+    // if (this.health <= 0) {
+    //   this.health = 0;
+    //   this.animationState = AnimationState.Dead;
+    // } else {
+    //   console.log(`Player health: ${this.health}`);
+    // }
+    const currentTime = Date.now();
+
+    // Check if enough time has passed since the last damage
+    if (currentTime - this.lastDamageTime >= this.damageCooldown) {
+      this.health -= damage;
+      this.lastDamageTime = currentTime; // Update the last damage time
+
+      if (this.health <= 0) {
+        this.health = 0;
+        this.animationState = AnimationState.Dead;
+      } else {
+        console.log(`Player health: ${this.health}`);
+      }
     } else {
-      console.log(`Player health: ${this.health}`);
+      console.log(`Damage cooldown active. Health: ${this.health}`);
     }
   }
 

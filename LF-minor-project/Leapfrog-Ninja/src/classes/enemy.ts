@@ -44,6 +44,8 @@ export class BaseEnemy implements ICharacter {
   frameX: number;
   frameY: number;
   maxHealth: number;
+  lastDamageTime: number = 0;
+  damageCooldown: number = 1000; // 1000 milliseconds = 1 second
   initialY: number;
   animationState: AnimationState;
   animationFrameRate: number;
@@ -322,13 +324,21 @@ export class BaseEnemy implements ICharacter {
    * @param {number} damage - The amount of damage to inflict.
    */
   decreaseHealth(damage: number): void {
-    this.health -= damage;
-    if (this.health <= 0) {
-      this.health = 0;
-      this.animationState = AnimationState.Dead;
-      this.isDead = true;
+    const currentTime = Date.now();
+
+    // Check if enough time has passed since the last damage
+    if (currentTime - this.lastDamageTime >= this.damageCooldown) {
+      this.health -= damage;
+      this.lastDamageTime = currentTime; // Update the last damage time
+
+      if (this.health <= 0) {
+        this.health = 0;
+        this.animationState = AnimationState.Dead;
+      } else {
+        console.log(`Player health: ${this.health}`);
+      }
     } else {
-      console.log(`Player health: ${this.health}`);
+      console.log(`Damage cooldown active. Health: ${this.health}`);
     }
   }
 
