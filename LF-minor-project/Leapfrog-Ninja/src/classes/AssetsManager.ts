@@ -108,7 +108,7 @@ class AssetsManager {
   public audios: { [key: string]: HTMLAudioElement } = {};
   public sprites: { [key: string]: HTMLImageElement } = {};
   public isSoundOn: boolean = true;
-  public initialGame?: Game;
+
   private assetsStillLoading: number = 0;
   private numAssets: number = 0;
   private loadedPercent: number = 0;
@@ -120,14 +120,6 @@ class AssetsManager {
       AssetsManager.instance = new AssetsManager();
     }
     return AssetsManager.instance;
-  }
-
-  public setInitialGameInstance(initalGame: Game): void {
-    this.initialGame = initalGame;
-  }
-
-  public getInitialGameInstance(): Game {
-    return this.initialGame!;
   }
 
   public toggleSound(status: SoundMode) {

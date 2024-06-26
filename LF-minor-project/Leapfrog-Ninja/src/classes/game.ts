@@ -106,6 +106,8 @@ export class Game implements Drawable {
     this.difficultyMode = difficultyMode;
     this.soundModeStatus = soundModeStatus;
 
+    console.log("my sound is", soundModeStatus);
+
     this.levelManager = new LevelManager();
     const currentLevel = this.levelManager.loadCurrentLevel();
 

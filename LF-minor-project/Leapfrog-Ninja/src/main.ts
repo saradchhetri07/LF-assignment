@@ -85,7 +85,7 @@ window.addEventListener("load", () => {
     ) as HTMLDivElement;
 
     const onRadio = document.getElementById("onRadio") as HTMLInputElement;
-    const offRadio = document.getElementById("onRadio") as HTMLInputElement;
+    const offRadio = document.getElementById("offRadio") as HTMLInputElement;
 
     const gameModeSelector = document.getElementById(
       "gameModeSelector"
@@ -346,8 +346,16 @@ window.addEventListener("load", () => {
     onRadio.addEventListener("click", () => {
       if (onRadio.checked) {
         soundModeStatus = SoundMode.ON;
-      } else if (offRadio.checked) {
+      }
+    });
+
+    offRadio.addEventListener("click", () => {
+      if (offRadio.checked) {
+        console.log("came to off the sound", soundModeStatus);
+
         soundModeStatus = SoundMode.OFF;
+
+        console.log("have already off the sound", soundModeStatus);
       }
     });
 
@@ -371,18 +379,6 @@ window.addEventListener("load", () => {
 
     function startGame() {
       clearStartButton();
-      const initialGame = new Game(
-        canvas,
-        ctx!,
-        //play with computer or multiplayer mode
-        gameMode,
-        chosenCharacter,
-        //difficulty mode
-        selectedMode,
-        soundModeStatus
-      );
-
-      assetsManager.setInitialGameInstance(initialGame);
 
       const game = new Game(
         canvas,
