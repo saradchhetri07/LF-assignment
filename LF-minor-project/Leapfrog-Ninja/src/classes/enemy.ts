@@ -1,34 +1,11 @@
-import { Size } from "./../interfaces/interface";
+import { AnimationSettings, Size } from "./../interfaces/interface";
 import { ICharacter, Position } from "../interfaces/interface";
 import { getEnemySprite } from "../utils/getEnemySprite";
 
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 import { Player } from "./player";
 import { assetsManager } from "./AssetsManager";
-
-/**
- * Enum representing the different animation states.
- */
-enum AnimationState {
-  Idle,
-  Run,
-  Attack,
-  ThrowWeapon,
-  Dead,
-  moveUp,
-}
-
-/**
- * Interface representing the settings for animations.
- */
-interface AnimationSettings {
-  maxFrame: number;
-  frameWidth: number;
-  frameHeight: number;
-  columns: number;
-  rows: number;
-  animationFrameRate: number;
-}
+import { AnimationState } from "../enums/animationStateEnum";
 
 /**
  * Class representing a base enemy.
@@ -324,26 +301,19 @@ export class BaseEnemy implements ICharacter {
    * @param {number} damage - The amount of damage to inflict.
    */
   decreaseHealth(damage: number): void {
-    // const currentTime = Date.now();
+    const currentTime = Date.now();
 
-    // if (this.health <= 0) {
-    //   this.health = 0;
-    //   this.animationState = AnimationState.Dead;
-    // }
-
-    // // Check if enough time has passed since the last damage
-    // if (currentTime - this.lastDamageTime >= this.damageCooldown) {
-    //   this.health -= damage;
-    //   this.lastDamageTime = currentTime; // Update the last damage time
-    // } else {
-    //   console.log(`Damage cooldown active. Health: ${this.health}`);
-    // }
-    this.health -= damage;
     if (this.health <= 0) {
       this.health = 0;
       this.animationState = AnimationState.Dead;
+    }
+
+    // Check if enough time has passed since the last damage
+    if (currentTime - this.lastDamageTime >= this.damageCooldown) {
+      this.health -= damage;
+      this.lastDamageTime = currentTime; // Update the last damage time
     } else {
-      console.log(`Player health: ${this.health}`);
+      console.log(`Damage cooldown active. Health: ${this.health}`);
     }
   }
 

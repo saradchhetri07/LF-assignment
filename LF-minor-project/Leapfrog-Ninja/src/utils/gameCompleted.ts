@@ -1,4 +1,3 @@
-import { assetsManager } from "../classes/AssetsManager";
 import { CANVAS_DIMENSIONS } from "../constants/constants";
 
 export function gameCompleted(context: CanvasRenderingContext2D): void {

@@ -1,3 +1,4 @@
+import { assetsManager } from "./../classes/AssetsManager";
 import { BaseEnemy } from "../classes/enemy";
 import enemyImage from "../assets/Images/enemy/enemyIdle.png";
 import enemyHeadImage from "../assets/Images/enemy/enemyIcon.png";
@@ -34,7 +35,7 @@ export const makeLevelEnemies = [
       },
       100,
       1,
-      4,
+      4 * assetsManager.DamageFactor,
       "level_1_sublevel_1",
       enemyImage,
       enemyHeadImage,
@@ -57,7 +58,7 @@ export const makeLevelEnemies = [
       },
       100,
       8,
-      8,
+      8 * assetsManager.DamageFactor,
       "level_2_Sublevel_1",
       orkImage,
       orkHeadImage,
@@ -80,7 +81,7 @@ export const makeLevelEnemies = [
       },
       100,
       8,
-      16,
+      16 * assetsManager.DamageFactor,
       "level_3_Sublevel_1",
       samuraiImage,
       samuraiIcon,

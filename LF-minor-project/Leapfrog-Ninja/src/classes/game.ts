@@ -36,7 +36,6 @@ export class Game implements Drawable {
 
   inputHandler1: InputHandler;
   inputHandler2: InputHandler;
-  damageFactor: number = 0;
 
   private levelManager: LevelManager;
   private lastTime: number;
@@ -50,13 +49,15 @@ export class Game implements Drawable {
   private difficultyMode: GameDifficulty = GameDifficulty.Easy;
 
   private context: CanvasRenderingContext2D;
+
+  mode: GameMode = GameMode.Computer;
+
   isPaused: boolean = false; // Initialize isPaused to false
   private soundModeStatus: SoundMode = SoundMode.ON;
   private kunai: Kunai[] = [];
   private kunaiClass?: Kunai;
   private playerKunaiLeft: boolean = false;
   private animationFrameId: number | null;
-  private mode: GameMode; // Add mode property
   private scroll?: Scroll;
   private enemyWeapon?: Weapon[] = [];
   private healthPotion?: HealthPotion;
@@ -123,14 +124,14 @@ export class Game implements Drawable {
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-    mode: GameMode,
+    gamemode: GameMode,
     chosenCharacter: Character,
     difficultyMode: GameDifficulty,
     soundModeStatus: SoundMode
   ) {
     this.canvas = canvas;
     this.context = context;
-    this.mode = mode;
+    this.mode = gamemode;
     this.chosenCharacter = chosenCharacter;
     this.difficultyMode = difficultyMode;
     this.soundModeStatus = soundModeStatus;
@@ -273,13 +274,8 @@ export class Game implements Drawable {
    * Start the game loop.
    */
   start(): void {
-    if (this.difficultyMode == GameDifficulty.Easy) {
-      this.damageFactor = 2;
-    } else if (this.difficultyMode == GameDifficulty.Medium) {
-      this.damageFactor = 4;
-    } else {
-      this.damageFactor = 6;
-    }
+    //set damage as per difficulty level
+    assetsManager.setDifficulty(this.difficultyMode);
 
     const backgroundMusic = assetsManager.audios.BACKGROUND;
     if (this.soundModeStatus == SoundMode.ON) {
@@ -556,6 +552,8 @@ export class Game implements Drawable {
       checkCollisions(this.player, this.enemy)
     ) {
       if (this.player.isAttacking && this.legitHit()) {
+        //draw blood spat in point of contact
+
         this.enemy.decreaseHealth(this.player.damageLevel);
       }
       if (this.enemy.isAttacking && this.legitHit()) {

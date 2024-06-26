@@ -55,3 +55,15 @@ export interface ICharacter extends Drawable, Movable {
   velocity: { x: number; y: number };
   isJumping: boolean;
 }
+
+/**
+ * Interface representing the settings for animations.
+ */
+export interface AnimationSettings {
+  maxFrame: number;
+  frameWidth: number;
+  frameHeight: number;
+  columns: number;
+  rows: number;
+  animationFrameRate: number;
+}

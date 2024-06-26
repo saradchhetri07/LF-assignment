@@ -30,6 +30,7 @@ import staminaPotion from "../assets/Images/gameplay/staminaPotion.png";
 import maleCharacter from "../assets/Images/gameplay/maleCharacter.png";
 import femaleCharacter from "../assets/Images/gameplay/femaleCharacter.png";
 import difficultyScreen from "../assets/Images/background/difficultyScreen.jpeg";
+import bloodSpat from "../assets/Images/background/bloodSpat.png";
 
 import background1 from "../assets/Images/background/platBackground-CH1.png";
 import background2 from "../assets/Images/background/background-CH2.png";
@@ -101,14 +102,14 @@ import bossThrowable from "../assets/Images/enemy/bossThrowable.png";
 import orkThrowable from "../assets/Images/enemy/orkThrowable.png";
 import bombs from "../assets/Images/enemy/star.png";
 import { SoundMode } from "../enums/sound";
-import { Game } from "./game";
+import { GameDifficulty } from "../enums/difficulty";
 
 class AssetsManager {
   private static instance: AssetsManager;
   public audios: { [key: string]: HTMLAudioElement } = {};
   public sprites: { [key: string]: HTMLImageElement } = {};
   public isSoundOn: boolean = true;
-
+  public DamageFactor: number = 1;
   private assetsStillLoading: number = 0;
   private numAssets: number = 0;
   private loadedPercent: number = 0;
@@ -127,6 +128,16 @@ class AssetsManager {
       this.isSoundOn = true;
     } else {
       this.isSoundOn = false;
+    }
+  }
+
+  public setDifficulty(status: GameDifficulty) {
+    if (status == GameDifficulty.Easy) {
+      this.DamageFactor = 2;
+    } else if (status == GameDifficulty.Medium) {
+      this.DamageFactor = 4;
+    } else {
+      this.DamageFactor = 6;
     }
   }
 
@@ -182,6 +193,7 @@ class AssetsManager {
     this.audios.NINJAGIRLSWINGING = loadAudio(ninjaGirlSwinging);
 
     // Load the sprite images
+    this.sprites.BLOODSPAT = loadSprite(bloodSpat);
     this.sprites.MALECHARACTER = loadSprite(maleCharacter);
     this.sprites.FEMALECHARACTER = loadSprite(femaleCharacter);
     this.sprites.STARTSCREEN = loadSprite(startScreen);
