@@ -31,7 +31,9 @@ A simple Express-based CRUD API for managing TODO items.
 - `PUT /todos/:id`: Update an existing TODO item
 - `DELETE /todos/:id`: Delete a TODO item
 
-## Live Link
+## docker pull
+
+docker pull saradchhetri7/todo-app:1.0.0
 
 ## Docker Image
 
